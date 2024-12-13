@@ -7,12 +7,13 @@ import {
     type Router
 } from 'vue-router';
 
-import Home from '../views/Home.vue';
+import Home from '../views/home/Home.vue';
+import Error from '../views/home/Error.vue';
 import Plans from '../views/plans/Plans.vue';
 import NewPlan from '../views/plans/NewPlan.vue';
 import ViewPlan from '../views/plans/ViewPlan.vue';
-import Contact from '../views/Contact.vue';
 import EditPlan from '../views/plans/EditPlan.vue';
+import Contact from '../views/Contact.vue';
 
 const router: Router = createRouter({
     history: createWebHistory(),
@@ -46,6 +47,11 @@ const router: Router = createRouter({
             path: '/contact',
             name: 'Contact',
             component: Contact
+        },
+        {
+            path: '/:catchAll(.*)',
+            name: 'Error',
+            component: Error
         }
     ]
 });

@@ -55,3 +55,18 @@ html {
             color: #0d6efd;
             background-color: white;
         }
+
+.skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+    color: transparent;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: #F5F5F5;
+    }
+
+    100% {
+        background-color: #E2E2E2;
+    }
+}

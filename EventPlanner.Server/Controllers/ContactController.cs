@@ -3,15 +3,24 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanner.Server.Controllers
 {
-    [ApiController]
     [Route("api/[controller]/[action]")]
-    public class ContactController(ILogger<ContactController> logger) : ControllerBase
+    [ApiController]
+    public class ContactController : ControllerBase
     {
-        #region Properties
+        #region Fields
 
-        private readonly ILogger<ContactController> logger = logger;
+        private readonly ILogger<ContactController> logger;
 
-        #endregion Properties
+        #endregion Fields
+
+        #region Constructors
+
+        public ContactController(ILogger<ContactController> logger)
+        {
+            this.logger = logger;
+        }
+
+        #endregion Constructors
 
         #region Public Methods
 

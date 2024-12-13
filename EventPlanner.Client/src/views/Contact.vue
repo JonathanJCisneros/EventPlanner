@@ -112,20 +112,15 @@
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response) => {
-                            let data: FormResponse;
-
-                            if (response.ok) {
-                                data = await response.json();
-                            }
-                            else {
-                                data = {
+                        .then(async (response: Response): FormResponse => {
+                            if (!response.ok) {
+                                return {
                                     success: false,
                                     message: 'Oops, we are having trouble submitting your message. Please try again later!'
-                                }
+                                };
                             }
 
-                            return data;
+                            return await response.json();
                         })
                         .then((response: FormResponse): void => {
                             this.stateMessage = response;

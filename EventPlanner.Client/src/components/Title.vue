@@ -22,6 +22,6 @@
         padding: 15px 0;
         background-color: lightblue;
         color: black;
-        margin: 0;
+        margin: 0 0 25px 0;
     }
 </style>

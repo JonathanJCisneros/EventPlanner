@@ -1,5 +1,7 @@
-﻿using EventPlanner.Server.Models.Contact;
+﻿using EventPlanner.Server.Models;
+using EventPlanner.Server.Models.Contact;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.Server.Controllers
 {
@@ -25,15 +27,17 @@ namespace EventPlanner.Server.Controllers
         #region Public Methods
 
         [HttpPost]
-        public ContactFormResponse SubmitContact([FromBody] ContactFormModel model)
+        public FormResponse SubmitContact([FromBody] ContactFormModel model)
         {
-            ContactFormResponse response = new()
+            model = model.Validate();
+
+            FormResponse response = new()
             {
                 Success = false,
                 Message = "Form submission failed!"
             };
 
-            if (model != null)
+            if (Validator.TryValidateObject(model, new ValidationContext(model), new List<ValidationResult>(), true))
             {
                 response.Success = true;
                 response.Message = "Form submission worked!";

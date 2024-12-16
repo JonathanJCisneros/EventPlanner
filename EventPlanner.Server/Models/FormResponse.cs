@@ -1,6 +1,6 @@
-﻿namespace EventPlanner.Server.Models.Contact
+﻿namespace EventPlanner.Server.Models
 {
-    public class ContactFormResponse
+    public class FormResponse
     {
         public bool Success { get; set; }
 

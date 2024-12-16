@@ -1,5 +1,9 @@
 <template>
-    <section :class="orientation">
+    <section :class="[orientation, classes]"
+             :style="{
+                'background-color': colors.background,
+                'color': colors.font
+             }">
         <div class="image-container">
             <img :src="image.source" :alt="image.altText" />
         </div>
@@ -16,18 +20,31 @@
         altText: string
     }
 
+    type Colors = {
+        font: string,
+        background: string
+    }
+
     export default defineComponent({
         props: {
             orientation: {
                 type: String,
                 required: true
             },
+            classes: {
+                type: String,
+                required: false
+            },
             image: {
                 type: Object as PropType<ImageContent>,
                 required: true
-            }
+            },
             details: {
                 type: String,
+                required: true
+            },
+            colors: {
+                type: Object as PropType<Colors>,
                 required: true
             }
         }
@@ -56,6 +73,10 @@
             flex-direction: column-reverse;
         }
 
+            section.column-reverse .description, section.column .description {
+                padding: 1.25rem;
+            }
+
     section > div {
         flex: 1;        
     }
@@ -72,7 +93,7 @@
         height: auto;
     }
 
-    .description {
-        padding: 1.25rem;
+    .description {        
+        text-align: center;
     }
 </style>

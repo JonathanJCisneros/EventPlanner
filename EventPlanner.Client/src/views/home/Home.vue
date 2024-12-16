@@ -11,6 +11,46 @@
                 <Pagination />
             </template>
         </Carousel>
+        <DetailsSection orientation="row"
+                        :image="{
+                            source: './src/assets/img/no-photo.png',
+                            altText: 'No Photo'
+                        }"
+                        details="Row Layout"
+                        :colors="{
+                            font: 'black',
+                            background: 'blue'
+                        }" />
+        <DetailsSection orientation="row-reverse"
+                        :image="{
+                            source: './src/assets/img/no-photo.png',
+                            altText: 'No Photo'
+                        }"
+                        details="Reverse Row Layout"
+                        :colors="{
+                            font: 'white',
+                            background: 'green'
+                        }" />
+        <DetailsSection orientation="column"
+                        :image="{
+                            source: './src/assets/img/no-photo.png',
+                            altText: 'No Photo'
+                        }"
+                        details="Column Layout"
+                        :colors="{
+                            font: 'white',
+                            background: 'purple'
+                        }" />
+        <DetailsSection orientation="column-reverse"
+                        :image="{
+                            source: './src/assets/img/no-photo.png',
+                            altText: 'No Photo'
+                        }"
+                        details="Reverse Column Layout"
+                        :colors="{
+                            font: 'black',
+                            background: 'red'
+                        }" />
     </div>
 </template>
 
@@ -46,7 +86,8 @@
             Carousel,
             Slide,
             Pagination,
-            Navigation
+            Navigation,
+            DetailsSection
         },
         async created(): void {
             await this.getContent();
@@ -67,25 +108,25 @@
                         return await response.json();
                     })
                     .then(async (data: null | ImageContent): void => {
-                        if (data) {
-                            this.loading = false;
-                            this.content = data;
-                        }
-                        else {
-                            attempts++;
+                        if (!data) {
+                            await this.handleFail(attempts);
 
-                            if (attempts < 2) {
-                                await this.getContent(attempts);
-                            }                            
+                            return;
                         }
+
+                        this.loading = false;
+                        this.content = data;
                     })
                     .catch(async (error: Error): void => {
-                        attempts++;
-
-                        if (attempts < 2) {
-                            await this.getContent(attempts);
-                        }  
+                        await this.handleFail(attempts);
                     });
+            },
+            async handleFail(attempts: number): void {
+                attempts++;
+
+                if (attempts < 2) {
+                    await this.getContent(attempts);
+                }  
             }
         }
     });

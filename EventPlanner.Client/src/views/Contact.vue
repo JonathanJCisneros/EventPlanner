@@ -57,6 +57,14 @@
     import { defineComponent } from 'vue';
     import Title from '../components/Title.vue';
 
+    import type {
+        FormResponse,
+        Errors,
+        ValidationResponse
+    } from '../assets/js/types.ts';
+
+    import validations from '../assets/js/validations.ts';
+
     type FormDetails = {
         name: string,
         email: string,
@@ -64,26 +72,12 @@
         message: string
     }
 
-    type FormMessages = {
-        name?: string,
-        email?: string,
-        subject?: string,
-        message?: string
-    }
-
-    type FormResponse = {
-        success: boolean,
-        message: string
-    }
-
     interface Data {
         loading: boolean,
         formDetails: FormDetails,
-        formMessages: FormMessages,
+        formMessages: Errors,
         stateMessage: null | FormResponse
-    }    
-
-    const isEmpty = (value: string): boolean => !value || /^\s$/g.test(value);
+    }     
 
     export default defineComponent({
         data(): Data {
@@ -104,7 +98,7 @@
         },
         methods: {
             async submitForm(): void {
-                if (this.validateForm()) {
+                if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/contact/submitcontact', {
                         method: 'POST',
                         headers: {
@@ -114,10 +108,7 @@
                     })
                         .then(async (response: Response): FormResponse => {
                             if (!response.ok) {
-                                return {
-                                    success: false,
-                                    message: 'Oops, we are having trouble submitting your message. Please try again later!'
-                                };
+                                return this.stateError();
                             }
 
                             return await response.json();
@@ -127,75 +118,43 @@
                         })
                         .catch((error: Error): void => {
                             console.log(error);
+
+                            this.stateMessage = this.stateError();
                         });                    
                 }
             },
-            validateForm(): boolean {
-                let isValid: boolean = true;
-                const errors: FormMessages = {};
+            isFormValid(): boolean {
+                let errors: Errors = {};
 
-                if (isEmpty(this.formDetails.name)) {
-                    errors['name'] = 'Name is required';
-                }
-                else if (this.formDetails.name.length < 3) {
-                    errors['name'] = 'Name must be at least 3 characters';
-                }
-                else if (this.formDetails.name.length > 30) {
-                    errors['name'] = 'Name can be no more than 30 characters long';
-                }
-                else {
-                    this.formDetails.name = this.formDetails.name.replace(/ +(?= )/g,'').trim();
+                let validationResponse: ValidationResponse = validations.name(this.formDetails.name, errors);
+                this.formDetails.name = validationResponse.value;
+                errors = validationResponse.errors;
 
-                    let split: Array<string> = this.formDetails.name.split(' ');
+                validationResponse = validations.email(this.formDetails.email, errors);
+                this.formDetails.email = validationResponse.value;
+                errors = validationResponse.errors;
 
-                    split = split.map((x: string) => {
-                        let format: string = x.charAt(0).toUpperCase();
+                validationResponse = validations.subject(this.formDetails.subject, errors);
+                this.formDetails.subject = validationResponse.value;
+                errors = validationResponse.errors;
 
-                        if (x.length > 1) {
-                            format += x.slice(1).toLowerCase();
-                        }                         
+                validationResponse = validations.message(this.formDetails.message, errors);
+                this.formDetails.message = validationResponse.value;
+                errors = validationResponse.errors;
 
-                        return format;
-                    });
-
-                    this.formDetails.name = split.join(' ');
-                }
-
-                if (isEmpty(this.formDetails.email)) {
-                    errors['email'] = 'Email is required';
-                }
-                else if (!/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g.test(this.formDetails.email)) {
-                    errors['email'] = 'Please enter a valid Email';
-                }
-                else {
-                    this.formDetails.email = this.formDetails.email.trim().toLowerCase();
-                }
-
-                if (this.formDetails.subject < 0) {
-                    errors['subject'] = 'Subject is required';
-                }
-
-                if (isEmpty(this.formDetails.message)) {
-                    errors['message'] = 'Message is required';
-                }
-                else if (this.formDetails.message.length < 5) {
-                    errors['message'] = 'Message must be at least 5 characters';
-                }
-                else if (this.formDetails.message.length > 350) {
-                    errors['message'] = 'Message must be no more than 350 characters long';
-                }
-                else {
-                    const formatted: string = this.formDetails.message.replace(/ +(?= )/g, '').trim();
-
-                    this.formDetails.message = formatted.charAt(0).toUpperCase() + formatted.slice(1).toLowerCase();
-                }
-
-                if (Object.keys(errors).length > 0) {
-                    isValid = false;
+                if (Object.keys(errors).length > 0) {                    
                     this.formMessages = errors;
+
+                    return false;
                 }
 
-                return isValid;
+                return true;
+            },
+            stateError(): FormResponse {
+                return {
+                    success: false,
+                    message: 'Oops, we are having trouble submitting your message. Please try again later!'
+                };
             }
         }
     });
@@ -266,7 +225,7 @@
         align-items: center;
         flex-direction: column;
         gap: 15px;
-        margin: 0 auto;
+        margin: 0 auto 25px auto;
         max-width: 450px;
         padding: 25px;
         border: 1px solid #c5c5c5;

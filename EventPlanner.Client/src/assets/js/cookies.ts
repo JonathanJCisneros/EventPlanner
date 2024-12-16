@@ -5,7 +5,7 @@ interface Cookies {
 }
 
 const cookies: Cookies = {
-    get: function (name: string): string {
+    get(name: string): string {
         name += "=";
 
         const decodedCookie = decodeURIComponent(document.cookie);
@@ -25,7 +25,7 @@ const cookies: Cookies = {
 
         return "";
     },
-    set: function (name: string, value: string, expirationDays: number): void {
+    set(name: string, value: string, expirationDays: number): void {
         const d = new Date();
         d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
 
@@ -33,7 +33,7 @@ const cookies: Cookies = {
 
         document.cookie = name + "=" + value + ";" + expires + ";path=/";
     },
-    delete: function (name: string): void {
+    delete(name: string): void {
         this.set(name, '', -1);
     }
 };

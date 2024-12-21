@@ -1,4 +1,4 @@
-﻿namespace EventPlanner.Server.Models.User
+﻿namespace EventPlanner.Server.Models
 {
     public class User : BaseModel
     {

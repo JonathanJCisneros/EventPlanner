@@ -190,8 +190,7 @@ const router: Router = createRouter({
 router.beforeEach((to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): void => {
     if (to.meta.hasOwnProperty('authorize') &&
         to.meta.authorize &&
-        localStorage.getItem('user_auth') === null &&
-        localStorage.getItem('jwt') === null
+        !localStorage.getItem('user_auth')
     ) {
         next('/user/login');
         return;
@@ -199,8 +198,7 @@ router.beforeEach((to: RouteLocationNormalizedGeneric, from: RouteLocationNormal
     else if (
         to.meta.hasOwnProperty('hideFromAuth') &&
         to.meta.hideFromAuth &&
-        localStorage.getItem('user_auth') &&
-        localStorage.getItem('jwt')
+        localStorage.getItem('user_auth')
     ) {
         next('/user/account');
     }

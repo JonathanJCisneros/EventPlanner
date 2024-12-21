@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventPlanner.Server.Extension_Methods;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.Server.Models.Contact
 {

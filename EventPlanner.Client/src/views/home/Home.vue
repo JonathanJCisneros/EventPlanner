@@ -97,7 +97,8 @@
                 await fetch('https://localhost:7134/api/home/getcontent', {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     }
                 })
                     .then(async (response: Response): null | ImageContent => {
@@ -144,6 +145,7 @@
         max-width: 650px;
         width: 100%;
         aspect-ratio: 16/9;
+        margin-bottom: 15px;
     }
 
     img {

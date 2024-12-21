@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EventPlanner.Server.Models
+namespace EventPlanner.Server.Extension_Methods
 {
-    public static class ValidationHelper
+    public static class ValidationExtensions
     {
         public static string FormatWord(this string value)
         {

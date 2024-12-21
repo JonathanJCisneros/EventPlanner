@@ -1,5 +1,5 @@
-﻿using EventPlanner.Server.Models;
-using Microsoft.AspNetCore.Http;
+﻿using EventPlanner.Server.Authorization;
+using EventPlanner.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventPlanner.Server.Controllers
@@ -25,6 +25,7 @@ namespace EventPlanner.Server.Controllers
 
         #region Public Methods
 
+        [Authorize]
         [HttpGet]
         public List<ImageContent> GetContent()
         {

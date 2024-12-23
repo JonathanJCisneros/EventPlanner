@@ -1,0 +1,11 @@
+@EventPlanner.Server_HostAddress = http://localhost:5088
+
+GET {{EventPlanner.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+###
+
+POST {{EventPlanner.Server_HostAddress}}/contact/submitinquiry
+Accept: application/json
+Content-Type: application/json
+Body: "{  }"
+###

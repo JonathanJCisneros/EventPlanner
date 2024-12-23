@@ -14,10 +14,10 @@ import Weddings from '../views/services/Weddings.vue';
 import Birthdays from '../views/services/Birthdays.vue';
 import Business from '../views/services/Business.vue';
 
-import Plans from '../views/plans/Plans.vue';
-import NewPlan from '../views/plans/NewPlan.vue';
-import ViewPlan from '../views/plans/ViewPlan.vue';
-import EditPlan from '../views/plans/EditPlan.vue';
+import Events from '../views/events/Events.vue';
+import NewEvent from '../views/events/NewEvent.vue';
+import ViewEvent from '../views/events/ViewEvent.vue';
+import EditEvent from '../views/events/EditEvent.vue';
 
 import Login from '../views/user/Login.vue';
 import Register from '../views/user/Register.vue';
@@ -77,9 +77,9 @@ const router: Router = createRouter({
             }
         },
         {
-            path: '/plans',
-            name: 'Plans',
-            component: Plans,
+            path: '/events',
+            name: 'Events',
+            component: Events,
             meta: {
                 authorize: true,
                 layout: {
@@ -89,9 +89,9 @@ const router: Router = createRouter({
             }
         },
         {
-            path: '/plans/new',
-            name: 'New Plan',
-            component: NewPlan,
+            path: '/events/new',
+            name: 'New Event',
+            component: NewEvent,
             meta: {
                 authorize: true,
                 layout: {
@@ -101,9 +101,9 @@ const router: Router = createRouter({
             }
         },
         {
-            path: '/plans/:id',
-            name: 'View Plan',
-            component: ViewPlan,
+            path: '/events/:id',
+            name: 'View Event',
+            component: ViewEvent,
             meta: {
                 authorize: true,
                 layout: {
@@ -113,9 +113,9 @@ const router: Router = createRouter({
             }
         },
         {
-            path: '/plans/:id/edit',
-            name: 'Edit Plan',
-            component: EditPlan,
+            path: '/events/:id/edit',
+            name: 'Edit Event',
+            component: EditEvent,
             meta: {
                 authorize: true,
                 layout: {
@@ -187,7 +187,7 @@ const router: Router = createRouter({
     ]
 });
 
-router.beforeEach((to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): void => {
+router.beforeEach(async (to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): Promise<void> => {
     if (to.meta.hasOwnProperty('authorize') &&
         to.meta.authorize &&
         !localStorage.getItem('user_auth')

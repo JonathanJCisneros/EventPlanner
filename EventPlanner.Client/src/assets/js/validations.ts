@@ -16,23 +16,27 @@ const formatWord = (word: string): string => {
 }
 
 interface Validations {
-    firstName(name: string, errors: Errors): ValidationResponse,
-    lastName(name: string, errors: Errors): ValidationResponse,
-    name(name: string, errors: Errors): ValidationResponse,
-    email(email: string, errors: Errors): ValidationResponse,
-    password(password: string, errors: Errors): ValidationResponse,
-    confirmPassword(password: string, confirmPassword: string, errors: Errors): ValidationResponse,
-    subject(subject: number, errors: Errors): ValidationResponse,
-    message(message: string, errors: Errors): ValidationResponse
+    firstName(name: string, errors: Errors): ValidationResponse<string>,
+    lastName(name: string, errors: Errors): ValidationResponse<string>,
+    name(name: string, errors: Errors): ValidationResponse<string>,
+    email(email: string, errors: Errors): ValidationResponse<string>,
+    phoneNumber(number: string, errors: Errors): ValidationResponse<string>,
+    password(password: string, errors: Errors): ValidationResponse<string>,
+    confirmPassword(password: string, confirmPassword: string, errors: Errors): ValidationResponse<string>,
+    subject(subject: number, errors: Errors): ValidationResponse<number>,
+    message(message: string, errors: Errors): ValidationResponse<string>
 }
 
 const validations: Validations = {
-    firstName(name: string, errors: Errors): ValidationResponse {
+    firstName(name: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(name)) {
-            errors['firstName'] = 'First Name is required';
+            errors['FirstName'] = 'First Name is required';
         }
         else if (name.length < 2) {
-            errors['firstName'] = 'First Name must be 3 characters long';
+            errors['FirstName'] = 'First Name must be at least 2 characters long';
+        }
+        else if (name.length > 50) {
+            errors['FirstName'] = 'First Name can be no more than 50 characters long';
         }
         else {
             name = formatWord(name);
@@ -43,12 +47,15 @@ const validations: Validations = {
             errors: errors
         };
     },
-    lastName(name: string, errors: Errors): ValidationResponse {
+    lastName(name: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(name)) {
-            errors['lastName'] = 'Last Name is required';
+            errors['LastName'] = 'Last Name is required';
         }
         else if (name.length < 2) {
-            errors['lastName'] = 'Last Name must be 3 characters long';
+            errors['LastName'] = 'Last Name must be aqt least 2 characters long';
+        }
+        else if (name.length > 50) {
+            errors['LastName'] = 'Last Name can be no more than 50 characters long';
         }
         else {
             name = formatWord(name);
@@ -59,20 +66,20 @@ const validations: Validations = {
             errors: errors
         };
     },
-    name(name: string, errors: Errors): ValidationResponse {
+    name(name: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(name)) {
-            errors['name'] = 'Name is required';
+            errors['Name'] = 'Name is required';
         }
         else if (name.length < 3) {
-            errors['name'] = 'Name must be at least 3 characters';
+            errors['Name'] = 'Name must be at least 3 characters';
         }
-        else if (name.length > 30) {
-            errors['name'] = 'Name can be no more than 30 characters long';
+        else if (name.length > 80) {
+            errors['Name'] = 'Name can be no more than 80 characters long';
         }
         else {
             name = name.replace(/ +(?= )/g, '').trim();
 
-            let split: Array<string> = name.split(' ');
+            let split: string[] = name.split(' ');
 
             split = split.map((x: string): string => formatWord(x));
 
@@ -84,12 +91,15 @@ const validations: Validations = {
             errors: errors
         }
     },
-    email(email: string, errors: Errors): ValidationResponse {
+    email(email: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(email)) {
-            errors['email'] = 'Email is required';
+            errors['Email'] = 'Email is required';
+        }
+        else if (email.length > 254) {
+            errors['Email'] = 'Email can be no more than 254 characters long';
         }
         else if (!/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g.test(email)) {
-            errors['email'] = 'Please enter a valid Email';
+            errors['Email'] = 'Please enter a valid Email';
         }
         else {
             email = email.trim().toLowerCase();
@@ -100,15 +110,34 @@ const validations: Validations = {
             errors: errors
         }
     },
-    password(password: string, errors: Errors): ValidationResponse {
+    phoneNumber(number: string, errors: Errors): ValidationResponse<string> {
+        if (isEmpty(number)) {
+            errors['PhoneNumber'] = 'Phone Number is required';
+        }
+        else if (!/^(\(?[0-9]{3}\)?)\s?([0-9]{3})\-?([0-9]{4})$/g.test(number)) {
+            errors['PhoneNumber'] = 'Phone Number must be valid'
+        }
+        else {
+            number = number.replace(/\(\)\s\-/g, '');
+        }
+
+        return {
+            value: number,
+            errors: errors
+        }
+    },
+    password(password: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(password)) {
-            errors['password'] = 'Password is required';
+            errors['Password'] = 'Password is required';
         }
         else if (password.length < 8) {
-            errors['password'] = 'Password must be at least 8 characters long';
+            errors['Password'] = 'Password must be at least 8 characters long';
+        }
+        else if (password.length > 128) {
+            errors['Password'] = 'Password can be no more than 128 characters long';
         }
         else if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/g.test(password)) {
-            errors['password'] = 'Password must have at least one upper case character, one lowercase character, one number and one special character';
+            errors['Password'] = 'Password must have at least one upper case character, one lowercase character, one number and one special character';
         }
         else {
             password = password.trim();
@@ -119,12 +148,12 @@ const validations: Validations = {
             errors: errors
         }
     },
-    confirmPassword(password: string, confirmPassword: string, errors: Errors): ValidationResponse {
+    confirmPassword(password: string, confirmPassword: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(confirmPassword)) {
-            errors['confirmPassword'] = 'Confirm Password is required';
+            errors['ConfirmPassword'] = 'Confirm Password is required';
         }
         else if (confirmPassword !== password) {
-            errors['confirmPassword'] = 'Passwords do not match';
+            errors['ConfirmPassword'] = 'Passwords do not match';
         }
 
         return {
@@ -132,9 +161,9 @@ const validations: Validations = {
             errors: errors
         }
     },
-    subject(subject: number, errors: Errors): ValidationResponse {
+    subject(subject: number, errors: Errors): ValidationResponse<number> {
         if (subject < 0) {
-            errors['subject'] = 'Subject is required';
+            errors['Subject'] = 'Subject is required';
         }
 
         return {
@@ -142,15 +171,15 @@ const validations: Validations = {
             errors: errors
         }
     },
-    message(message: string, errors: Errors): ValidationResponse {
+    message(message: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(message)) {
-            errors['message'] = 'Message is required';
+            errors['Message'] = 'Message is required';
         }
         else if (message.length < 5) {
-            errors['message'] = 'Message must be at least 5 characters';
+            errors['Message'] = 'Message must be at least 5 characters';
         }
-        else if (message.length > 350) {
-            errors['message'] = 'Message must be no more than 350 characters long';
+        else if (message.length > 300) {
+            errors['Message'] = 'Message must be no more than 300 characters long';
         }
         else {
             const formatted: string = message.replace(/ +(?= )/g, '').trim();

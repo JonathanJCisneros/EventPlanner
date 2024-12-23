@@ -4,18 +4,19 @@ export type FormResponse = {
 }
 
 export type Errors = {
-    firstName?: string,
-    lastName?: string,
-    name?: string,
-    email?: string,
-    password?: string,
-    confirmPassword?: string,
-    birthday?: string,
-    subject?: string,
-    message?: string
+    FirstName?: string,
+    LastName?: string,
+    Name?: string,
+    Email?: string,
+    PhoneNumber?: string,
+    Password?: string,
+    ConfirmPassword?: string,
+    Birthday?: string,
+    Subject?: string,
+    Message?: string
 }
 
-export type ValidationResponse = {
-    value: string | number,
+export type ValidationResponse<T> = {
+    value: T,
     errors: Errors
 }

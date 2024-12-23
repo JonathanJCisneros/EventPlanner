@@ -1,34 +1,37 @@
 <template>
     <Title title="Register" />
     <div class="register">
-        <div v-if="stateMessage" :class="stateMessage.success ? 'successful' : 'error'">
-            {{ stateMessage.message }}
-        </div>
+        <div v-if="stateMessage" :class="error">{{ stateMessage.message }}</div>
         <form v-on:submit.prevent="submitRegister">
             <div>
                 <label for="firstName">First Name</label>
                 <input type="text" id="firstName" name="firstName" v-model="formDetails.firstName" />
-                <span v-if="formMessages.hasOwnProperty('firstName')">{{ formMessages.firstName }}</span>
+                <span v-if="formMessages.hasOwnProperty('FirstName')">{{ formMessages.FirstName }}</span>
             </div>
             <div>
                 <label for="lastName">Last Name</label>
                 <input type="text" id="lastName" name="lastName" v-model="formDetails.lastName" />
-                <span v-if="formMessages.hasOwnProperty('lastName')">{{ formMessages.lastName }}</span>
+                <span v-if="formMessages.hasOwnProperty('LastName')">{{ formMessages.LastName }}</span>
             </div>
             <div>
                 <label for="email">Email</label>
                 <input type="text" id="email" name="email" v-model="formDetails.email" />
-                <span v-if="formMessages.hasOwnProperty('email')">{{ formMessages.email }}</span>
+                <span v-if="formMessages.hasOwnProperty('Email')">{{ formMessages.Email }}</span>
+            </div>
+            <div>
+                <label for="phoneNumber">Phone Number</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" v-model="formDetails.phoneNumber" @input="formatNumber" />
+                <span v-if="formMessages.hasOwnProperty('PhoneNumber')">{{ formMessages.PhoneNumber }}</span>
             </div>
             <div>
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" v-model="formDetails.password" />
-                <span v-if="formMessages.hasOwnProperty('password')">{{ formMessages.password }}</span>
+                <span v-if="formMessages.hasOwnProperty('Password')">{{ formMessages.Password }}</span>
             </div>
             <div>
                 <label for="confirmPassword">Confirm Password</label>
                 <input type="password" id="confirmPassword" name="confirmPassword" v-model="formDetails.confirmPassword" />
-                <span v-if="formMessages.hasOwnProperty('confirmPassword')">{{ formMessages.confirmPassword }}</span>
+                <span v-if="formMessages.hasOwnProperty('ConfirmPassword')">{{ formMessages.ConfirmPassword }}</span>
             </div>
             <div>
                 <button type="submit" class="button success">Register</button>
@@ -43,6 +46,7 @@
     import { defineComponent } from 'vue';
     import { RouterLink } from 'vue-router';
     import Title from '../../components/Title.vue';
+    import router from '../../routes/routes.ts';
 
     import type {
         FormResponse,
@@ -56,6 +60,7 @@
         firstName: string,
         lastName: string,
         email: string,
+        phoneNumber: string,
         password: string,
         confirmPassword: string
     }
@@ -73,6 +78,7 @@
                     firstName: '',
                     lastName: '',
                     email: '',
+                    phoneNumber: '',
                     password: '',
                     confirmPassword: ''
                 },
@@ -85,59 +91,71 @@
             RouterLink
         },
         methods: {
-            async submitRegister(): void {
+            async submitRegister(): Promise<void> {
                 if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/user/register', {
                         method: 'POST',
                         headers: {
+                            'Accept': 'application/json',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): FormResponse => {
+                        .then(async (response: Response): Promise<null | FormResponse> => {
                             if (!response.ok) {
-                                return this.stateError();
+                                return null;
                             }
 
                             return await response.json();
                         })
-                        .then((response: FormResponse): void => {
-                            this.stateMessage = response;
+                        .then(async (response: null | FormResponse): Promise<void> => {
+                            if (!data) {
+                                await this.handleFail(attempts);
+
+                                return;
+                            }
+
+                            if (!data.success) {
+                                this.stateMessage = data.message;
+
+                                return;
+                            }
+
+                            router.push('/user/account');
                         })
-                        .catch((error: Error): void => {
+                        .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            this.stateMessage = this.stateError();
+                            await this.handleFail(attempts);
                         });
                 }
             },
             isFormValid(): boolean {
                 let errors: Errors = {};
 
-                let validationResponse: ValidationResponse = validations.firstName(this.formDetails.firstName, errors);
+                const firstNameValidation: ValidationResponse<string> = validations.firstName(this.formDetails.firstName, errors);
+                this.formDetails.firstName = firstNameValidation.value;
+                errors = firstNameValidation.errors;
 
-                this.formDetails.firstName = validationResponse.value;
-                errors = validationResponse.errors;
+                const lastNameValidation: ValidationResponse<string> = validations.lastName(this.formDetails.lastName, errors);
+                this.formDetails.lastName = lastNameValidation.value;
+                errors = lastNameValidation.errors;
 
-                validationResponse = validations.lastName(this.formDetails.lastName, errors);
+                const emailValidation: ValidationResponse<string> = validations.email(this.formDetails.email, errors);
+                this.formDetails.email = emailValidation.value;
+                errors = emailValidation.errors;
 
-                this.formDetails.lastName = validationResponse.value;
-                errors = validationResponse.errors;
+                const phoneNumberValidation: ValidationResponse<string> = vallidations.phoneNumber(this.formDetails.phoneNumber, errors);
+                this.formDetails.phoneNumber = phoneNumberValidation.value;
+                errors = phoneNumberValidation.errors;
 
-                validationResponse = validations.email(this.formDetails.email, errors);
+                const passwordValidation: ValidationResponse<string> = validations.password(this.formDetails.password, errors);
+                this.formDetails.password = passwordValidation.value;
+                errors = passwordValidation.errors;
 
-                this.formDetails.email = validationResponse.value;
-                errors = validationResponse.errors;
-
-                validationResponse = validations.password(this.formDetails.password, errors);
-
-                this.formDetails.password = validationResponse.value;
-                errors = validationResponse.errors;
-
-                validationResponse = validations.confirmPassword(this.formDetails.password, this.formDetails.confirmPassword, errors);
-
-                this.formDetails.confirmPassword = validationResponse.value;
-                errors = validationResponse.errors;
+                const confirmPasswordValidation: ValidationResponse<string> = validations.confirmPassword(this.formDetails.password, this.formDetails.confirmPassword, errors);
+                this.formDetails.confirmPassword = confirmPasswordValidation.value;
+                errors = confirmPasswordValidation.errors;
 
                 if (Object.keys(errors).length > 0) {
                     this.formMessages = errors;
@@ -147,11 +165,25 @@
 
                 return true;
             },
-            stateError(): FormResponse {
-                return {
+            async handleFail(attempts: number): Promise<void> {
+                attempts++;
+
+                if (attempts < 2) {
+                    await this.submitRegister(attempts);
+
+                    return;
+                }
+
+                this.stateMessage = {
                     success: false,
                     message: 'Oops, we are having trouble registering. Please try again later!'
                 };
+            },
+            formatNumber(): void {
+                if (this.formDetails.phoneNumber) {
+                    const x: string[] = this.formDetails.phoneNumber.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+                    this.formDetails.phoneNumber = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+                }                
             }
         }
     });

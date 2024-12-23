@@ -17,23 +17,23 @@
                     </a>
                     <ul>
                         <li>
-                            <RouterLink to="/services/weddings">Weddings</RouterLink>
+                            <RouterLink class="dropdown-item" to="/services/weddings">Weddings</RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/services/birthdays">Birthdays</RouterLink>
+                            <RouterLink class="dropdown-item" to="/services/birthdays">Birthdays</RouterLink>
                         </li>
                         <li>
-                            <RouterLink to="/services/business">Business</RouterLink>
+                            <RouterLink class="dropdown-item" to="/services/business">Business</RouterLink>
                         </li>
                     </ul>
                 </div>
-                <RouterLink to="/plans">Plans</RouterLink>
-                <RouterLink to="/plans/new">New Plan</RouterLink>
+                <RouterLink to="/events">Upcoming Events</RouterLink>
+                <RouterLink to="/events/new" v-if="isLoggedIn">New Plan</RouterLink>
                 <RouterLink to="/contact">Contact Us</RouterLink>
             </nav>
         </div>
         <nav>
-            <template v-if="isSignedIn">
+            <template v-if="isLoggedIn">
                 <Notifications />
                 <RouterLink to="/user/account">My Account</RouterLink>
                 <a href="javascript:void(0)" v-on:click.prevent="logout">Logout</a>
@@ -63,11 +63,22 @@
             Notifications
         },
         computed: {
-            isSignedIn: function (): boolean {
+            isLoggedIn: function (): boolean {
                 return localStorage.getItem('user_auth') && localStorage.getItem('jwt');
             }
         },
+        mounted() {
+            document.addEventListener('click', this.close)
+        },
+        beforeDestroy() {
+            document.removeEventListener('click', this.close)
+        },
         methods: {
+            close(e) {
+                if (this.opened && !['opened', 'dropdown', 'dropdown-item'].some(x => e.target.classList.contains(x))) {
+                    this.opened = false
+                }
+            },
             handleDropdown() {
                 this.opened = !this.opened;
             },

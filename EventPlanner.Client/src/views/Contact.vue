@@ -15,16 +15,16 @@
         <h4>Or</h4>
         <section class="form">
             <h3>Leave us a message!</h3>
-            <form v-on:submit.prevent="submitForm">
+            <form v-on:submit.prevent="submitInquiry">
                 <div>
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name" v-model="formDetails.name" />
-                    <span v-if="formMessages.hasOwnProperty('name')">{{ formMessages.name }}</span>
+                    <span v-if="formMessages.hasOwnProperty('Name')">{{ formMessages.Name }}</span>
                 </div>
                 <div>
                     <label for="email">Email</label>
                     <input type="text" id="email" name="email" v-model="formDetails.email" />
-                    <span v-if="formMessages.hasOwnProperty('email')">{{ formMessages.email }}</span>
+                    <span v-if="formMessages.hasOwnProperty('Email')">{{ formMessages.Email }}</span>
                 </div>
                 <div>
                     <label for="subject">Subject</label>
@@ -35,12 +35,12 @@
                         <option value="2">Partnership</option>
                         <option value="3">Ideas</option>
                     </select>
-                    <span v-if="formMessages.hasOwnProperty('subject')">{{ formMessages.subject }}</span>
+                    <span v-if="formMessages.hasOwnProperty('Subject')">{{ formMessages.Subject }}</span>
                 </div>
                 <div>
                     <label for="message">Message</label>
                     <textarea id="message" name="message" rows="4" cols="50" v-model="formDetails.message"></textarea>
-                    <span v-if="formMessages.hasOwnProperty('message')">{{ formMessages.message }}</span>
+                    <span v-if="formMessages.hasOwnProperty('Message')">{{ formMessages.Message }}</span>
                 </div>
                 <div>
                     <button type="submit" class="button success">Submit</button>
@@ -97,7 +97,7 @@
             Title
         },
         methods: {
-            async submitForm(): void {
+            async submitInquiry(attempts: number = 0): Promise<void> {
                 if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/contact/submitcontact', {
                         method: 'POST',
@@ -106,41 +106,47 @@
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): FormResponse => {
+                        .then(async (response: Response): Promise<FormResponse> => {
                             if (!response.ok) {
-                                return this.stateError();
+                                return null;
                             }
 
                             return await response.json();
                         })
-                        .then((response: FormResponse): void => {
-                            this.stateMessage = response;
+                        .then(async (data: null | FormResponse): Promise<void> => {
+                            if (!data) {
+                                await this.handleFail(attempts);
+
+                                return;
+                            }
+
+                            this.stateMessage = data;
                         })
-                        .catch((error: Error): void => {
+                        .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            this.stateMessage = this.stateError();
+                            await this.handleFail(attempts);
                         });                    
                 }
             },
             isFormValid(): boolean {
                 let errors: Errors = {};
 
-                let validationResponse: ValidationResponse = validations.name(this.formDetails.name, errors);
-                this.formDetails.name = validationResponse.value;
-                errors = validationResponse.errors;
+                const nameValidation: ValidationResponse<string> = validations.name(this.formDetails.name, errors);
+                this.formDetails.name = nameValidation.value;
+                errors = nameValidation.errors;
 
-                validationResponse = validations.email(this.formDetails.email, errors);
-                this.formDetails.email = validationResponse.value;
-                errors = validationResponse.errors;
+                const emailValidation: ValidationResponse<string> = validations.email(this.formDetails.email, errors);
+                this.formDetails.email = emailValidation.value;
+                errors = emailValidation.errors;
 
-                validationResponse = validations.subject(this.formDetails.subject, errors);
-                this.formDetails.subject = validationResponse.value;
-                errors = validationResponse.errors;
+                const subjectValidation: ValidationResponse<number> = validations.subject(this.formDetails.subject, errors);
+                this.formDetails.subject = subjectValidation.value;
+                errors = subjectValidation.errors;
 
-                validationResponse = validations.message(this.formDetails.message, errors);
-                this.formDetails.message = validationResponse.value;
-                errors = validationResponse.errors;
+                const messageValidation: ValidationResponse<string> = validations.message(this.formDetails.message, errors);
+                this.formDetails.message = messageValidation.value;
+                errors = messageValidation.errors;
 
                 if (Object.keys(errors).length > 0) {                    
                     this.formMessages = errors;
@@ -150,8 +156,16 @@
 
                 return true;
             },
-            stateError(): FormResponse {
-                return {
+            async handleFail(attempts: number): Promise<void> {
+                attempts++;
+
+                if (attempts < 2) {
+                    await this.submitInquiry(attempts);
+
+                    return;
+                }
+
+                this.stateMessage = {
                     success: false,
                     message: 'Oops, we are having trouble submitting your message. Please try again later!'
                 };

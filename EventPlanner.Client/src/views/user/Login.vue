@@ -1,9 +1,7 @@
 <template>
     <Title title="Login" />
     <div class="login">
-        <div v-if="stateMessage" :class="stateMessage.success ? 'successful' : 'error'">
-            {{ stateMessage.message }}
-        </div>
+        <div v-if="stateMessage" class="error">{{ stateMessage.message }}</div>
         <form v-on:submit.prevent="submitLogin">
             <div>
                 <label for="email">Email</label>
@@ -28,6 +26,7 @@
     import { defineComponent } from 'vue';
     import { RouterLink } from 'vue-router';
     import Title from '../../components/Title.vue';
+    import router from '../../routes/routes.ts';
 
     import type {
         FormResponse,
@@ -35,7 +34,7 @@
         ValidationResponse
     } from '../../assets/js/types.ts';
 
-    import validations from '../../assets/js/validations.ts';
+    import validations from '../../assets/js/validations.ts';    
 
     type FormDetails = {
         email: string,
@@ -64,44 +63,55 @@
             RouterLink
         },
         methods: {
-            async submitLogin(): void {
+            async submitLogin(): Promise<void> {
                 if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/user/login', {
                         method: 'POST',
                         headers: {
+                            'Accept': 'application/json',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): FormResponse => {
+                        .then(async (response: Response): Promise<null | FormResponse> => {
                             if (!response.ok) {
-                                return this.stateError();
+                                return null;
                             }
 
                             return await response.json();
                         })
-                        .then((response: FormResponse): void => {
-                            this.stateMessage = response;
+                        .then(async (data: null | FormResponse): Promise<void> => {
+                            if (!data) {
+                                await this.handleFail(attempts);
+
+                                return;
+                            }
+
+                            if (!data.success) {
+                                this.stateMessage = data.message;
+
+                                return;
+                            }
+
+                            router.push('/user/account');
                         })
-                        .catch((error: Error): void => {
+                        .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            this.stateMessage = this.stateError();
+                            await this.handleFail(attempts);
                         });
                 }
             },
             isFormValid(): boolean {
                 let errors: Errors = {};
 
-                let validationResponse: ValidationResponse = validations.email(this.formDetails.email, errors);
+                const emailValidation: ValidationResponse<string> = validations.email(this.formDetails.email, errors);
+                this.formDetails.email = emailValidation.value;
+                errors = emailValidation.errors;
 
-                this.formDetails.email = validationResponse.value;
-                errors = validationResponse.errors;
-
-                validationResponse = validations.password(this.formDetails.password, errors);
-
-                this.formDetails.password = validationResponse.value;
-                errors = validationResponse.errors;
+                const passwordValidation: ValidationResponse<string> = validations.password(this.formDetails.password, errors);
+                this.formDetails.password = passwordValidation.value;
+                errors = passwordValidation.errors;
 
                 if (Object.keys(errors).length > 0) {
                     this.formMessages = errors;
@@ -111,8 +121,16 @@
 
                 return true;
             },
-            stateError(): FormResponse {
-                return {
+            async handleFail(attempts: number): Promise<void> {
+                attempts++;
+
+                if (attempts < 2) {
+                    await this.submitLogin(attempts);
+
+                    return;
+                }
+
+                this.stateMessage = {
                     success: false,
                     message: 'Oops, we are having trouble logging you in. Please try again later!'
                 };

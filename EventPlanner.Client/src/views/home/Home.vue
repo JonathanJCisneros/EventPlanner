@@ -89,11 +89,11 @@
             Navigation,
             DetailsSection
         },
-        async created(): void {
+        async created(): Promise<void> {
             await this.getContent();
         },
         methods: {
-            async getContent(attempts: number = 0): void {
+            async getContent(attempts: number = 0): Promise<void> {
                 await fetch('https://localhost:7134/api/home/getcontent', {
                     method: 'GET',
                     headers: {
@@ -101,14 +101,14 @@
                         'Content-Type': 'application/json'
                     }
                 })
-                    .then(async (response: Response): null | ImageContent => {
+                    .then(async (response: Response): Promise<null | ImageContent> => {
                         if (!response.ok) {
                             return null;
                         }
 
                         return await response.json();
                     })
-                    .then(async (data: null | ImageContent): void => {
+                    .then(async (data: null | ImageContent): Promise<void> => {
                         if (!data) {
                             await this.handleFail(attempts);
 
@@ -118,11 +118,13 @@
                         this.loading = false;
                         this.content = data;
                     })
-                    .catch(async (error: Error): void => {
+                    .catch(async (error: Error): Promise<void> => {
+                        console.log(error);
+
                         await this.handleFail(attempts);
                     });
             },
-            async handleFail(attempts: number): void {
+            async handleFail(attempts: number): Promise<void> {
                 attempts++;
 
                 if (attempts < 2) {

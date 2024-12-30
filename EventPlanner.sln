@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPlanner.Core", "EventP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPlanner.API", "EventPlanner.API\EventPlanner.API.csproj", "{A3ED3B85-5CBA-4FFA-AA6B-3D13B7385EED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventPlanner.Integration", "EventPlanner.Integration\EventPlanner.Integration.csproj", "{E72BDA01-BDB9-455A-8351-B7C0EFD81044}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{A3ED3B85-5CBA-4FFA-AA6B-3D13B7385EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3ED3B85-5CBA-4FFA-AA6B-3D13B7385EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3ED3B85-5CBA-4FFA-AA6B-3D13B7385EED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E72BDA01-BDB9-455A-8351-B7C0EFD81044}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E72BDA01-BDB9-455A-8351-B7C0EFD81044}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E72BDA01-BDB9-455A-8351-B7C0EFD81044}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E72BDA01-BDB9-455A-8351-B7C0EFD81044}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

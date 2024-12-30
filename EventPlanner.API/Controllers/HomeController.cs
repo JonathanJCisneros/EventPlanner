@@ -57,7 +57,7 @@ namespace EventPlanner.API.Controllers
             ];
 
             return images;
-        }
+        }   
 
         #endregion Public Methods
     }

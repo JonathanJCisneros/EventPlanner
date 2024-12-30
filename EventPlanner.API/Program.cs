@@ -4,30 +4,57 @@ using EventPlanner.Repository;
 using EventPlanner.Service;
 using EventPlanner.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using EventPlanner.Integration.Cloudinary;
+using System.Text;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+AppSettings settings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+builder.Services.AddSingleton(settings);
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-});
+})
+    .AddJwtBearer(options => 
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = settings.Issuer,
+            ValidAudience = settings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret))
+        };
+    });
 
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IMySqlRepository, MySqlRepository>(x => {    
-    return new MySqlRepository(builder.Configuration.GetConnectionString("eventPlannerMySql"));
-});
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+#region Integrations
+
+builder.Services.AddScoped<ICloudinaryClient, CloudinaryClient>();
+
+#endregion Integrations
 
 #region Repositories
 
+builder.Services.AddScoped<IMySqlRepository, MySqlRepository>(x => {
+    return new MySqlRepository(builder.Configuration.GetConnectionString("eventPlannerMySql"));
+});
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 
 #endregion Repositories
@@ -35,6 +62,7 @@ builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 #region Services
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IInquiryService, InquiryService>();
 
 #endregion Services

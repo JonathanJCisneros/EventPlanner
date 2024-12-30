@@ -39,13 +39,13 @@
     type FormDetails = {
         email: string,
         password: string
-    }
+    };
 
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
         stateMessage: null | FormResponse
-    }
+    };
 
     export default defineComponent({
         data(): Data {
@@ -88,10 +88,15 @@
                             }
 
                             if (!data.success) {
-                                this.stateMessage = data.message;
+                                this.stateMessage = data;
 
                                 return;
                             }
+
+                            this.formDetails = {
+                                email: '',
+                                password: ''
+                            };
 
                             router.push('/user/account');
                         })

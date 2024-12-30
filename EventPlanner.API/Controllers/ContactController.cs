@@ -2,7 +2,6 @@
 using EventPlanner.API.Models.Forms.Contact;
 using EventPlanner.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.API.Controllers
 {
@@ -30,7 +29,7 @@ namespace EventPlanner.API.Controllers
         #region Public Methods
 
         [HttpPost]
-        public FormResponse SubmitInquiry([FromBody] InquiryModel model)
+        public async Task<FormResponse> SubmitInquiry([FromBody] InquiryModel model)
         {
             model = model.FormatModel();
 
@@ -40,7 +39,13 @@ namespace EventPlanner.API.Controllers
                 Message = "We're having technical difficulties submitting your message at this time. Please try again later!"
             };
 
+            bool created = await _inquiryService.Create(model.ToInquiry());
 
+            if (created)
+            {
+                response.Success = true;
+                response.Message = "Your message has been received, we will be in touch!";
+            }
 
             return response;
         }

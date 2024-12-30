@@ -62,13 +62,6 @@ namespace EventPlanner.API.Authorization
 
         public async Task InvokeAsync(HttpContext context)
         {
-            //string? token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
-
-            //if (token != null)
-            //{
-            //    AttachUserToContext(context, userService, token);
-            //}
-
             int status = StatusCodes.Status200OK;
             string? error = null;
 

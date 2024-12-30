@@ -64,13 +64,13 @@
         phoneNumber: string,
         password: string,
         confirmPassword: string
-    }
+    };
 
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
         stateMessage: null | FormResponse
-    }
+    };
 
     export default defineComponent({
         data(): Data {
@@ -122,10 +122,19 @@
                                 return;
                             }
                             else if (!data.success) {
-                                this.stateMessage = data.message;
+                                this.stateMessage = data;
 
                                 return;
                             }
+
+                            this.formDetails = {
+                                firstName: '',
+                                lastName: '',
+                                email: '',
+                                phoneNumber: '',
+                                password: '',
+                                confirmPassword: ''
+                            };
 
                             router.push('/user/account');
                         })

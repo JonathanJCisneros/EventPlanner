@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EventPlanner.Core\EventPlanner.Core.csproj" />
+    <ProjectReference Include="..\EventPlanner.Integration\EventPlanner.Integration.csproj" />
     <ProjectReference Include="..\EventPlanner.Repository\EventPlanner.Repository.csproj" />
   </ItemGroup>
 

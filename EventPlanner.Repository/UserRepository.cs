@@ -101,16 +101,7 @@ namespace EventPlanner.Repository
             DataTable dt = await db.ExecuteQuery(query, parameters);
 
             return dt.Rows.Count == 0 ? null : ConvertTable(dt)[0];
-        }
-
-        public async Task<List<User>> GetAll()
-        {
-            string query = "SELECT * FROM users;";
-
-            DataTable dt = await db.ExecuteQuery(query, []);
-
-            return ConvertTable(dt);
-        }
+        }        
 
         public async Task<List<User>> GetMany(List<Guid> ids)
         {
@@ -128,6 +119,15 @@ namespace EventPlanner.Repository
                         ORDER BY created_date DESC;";
 
             DataTable dt = await db.ExecuteQuery(query, response.Parameters);
+
+            return ConvertTable(dt);
+        }
+
+        public async Task<List<User>> GetAll()
+        {
+            string query = "SELECT * FROM users;";
+
+            DataTable dt = await db.ExecuteQuery(query, []);
 
             return ConvertTable(dt);
         }

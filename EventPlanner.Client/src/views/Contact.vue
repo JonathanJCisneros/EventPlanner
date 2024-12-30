@@ -133,6 +133,7 @@
                                 return;
                             }
 
+                            this.formDetails = {};
                             this.stateMessage = data;
                         })
                         .catch(async (error: Error): Promise<void> => {

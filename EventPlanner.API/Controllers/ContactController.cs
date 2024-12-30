@@ -1,5 +1,6 @@
 ﻿using EventPlanner.API.Models.Forms;
 using EventPlanner.API.Models.Forms.Contact;
+using EventPlanner.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -11,15 +12,17 @@ namespace EventPlanner.API.Controllers
     {
         #region Fields
 
-        private readonly ILogger<ContactController> logger;
+        private readonly IInquiryService _inquiryService;
+        private readonly ILogger<ContactController> _logger;
 
         #endregion Fields
 
         #region Constructors
 
-        public ContactController(ILogger<ContactController> logger)
+        public ContactController(IInquiryService inquiryService, ILogger<ContactController> logger)
         {
-            this.logger = logger;
+            _inquiryService = inquiryService;
+            _logger = logger;
         }
 
         #endregion Constructors
@@ -34,14 +37,10 @@ namespace EventPlanner.API.Controllers
             FormResponse response = new()
             {
                 Success = false,
-                Message = "Form submission failed!"
+                Message = "We're having technical difficulties submitting your message at this time. Please try again later!"
             };
 
-            if (Validator.TryValidateObject(model, new ValidationContext(model), [], true))
-            {
-                response.Success = true;
-                response.Message = "Form submission worked!";
-            }
+
 
             return response;
         }

@@ -1,4 +1,5 @@
 ﻿using EventPlanner.Service;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
@@ -96,7 +97,6 @@ namespace EventPlanner.API.Authorization
             { 
                 context.Response.StatusCode = status;
                 await context.Response.WriteAsJsonAsync(new Error(error));
-
                 return;
             }
 

@@ -1,4 +1,6 @@
 using EventPlanner.API.Authorization;
+using EventPlanner.Repository.Interfaces;
+using EventPlanner.Repository;
 using EventPlanner.Service;
 using EventPlanner.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,7 +21,23 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
+builder.Services.AddScoped<IMySqlRepository, MySqlRepository>(x => {    
+    return new MySqlRepository(builder.Configuration.GetConnectionString("eventPlannerMySql"));
+});
+
+#region Repositories
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
+
+#endregion Repositories
+
+#region Services
+
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInquiryService, InquiryService>();
+
+#endregion Services
 
 WebApplication app = builder.Build();
 
@@ -38,7 +56,7 @@ app.UseCors(x => x
     .AllowAnyHeader()
 );
 
-//app.UseMiddleware<CustomMiddleware>();
+app.UseMiddleware<CustomMiddleware>();
 
 app.UseHttpsRedirection();
 

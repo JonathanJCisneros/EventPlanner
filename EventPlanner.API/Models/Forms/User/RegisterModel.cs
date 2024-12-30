@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventPlanner.Core.User;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.API.Models.Forms.User
 {
-    public class RegisterModel : BaseModel
+    public class RegisterModel
     {
         [Required(ErrorMessage = "First Name is required")]
         [MinLength(2, ErrorMessage = "First Name must be at least 2 characters long")]
@@ -35,13 +36,35 @@ namespace EventPlanner.API.Models.Forms.User
 
         public RegisterModel FormatModel()
         {
-            FirstName = FirstName.FormatWord(); 
+            FirstName = FirstName.FormatWord();
             LastName = LastName.FormatWord();
             Email = Email.FormatLower();
             PhoneNumber = PhoneNumber.FormatPhoneNumber();
             Password = !String.IsNullOrWhiteSpace(Password) ? Password.Trim() : Password;
 
             return this;
+        }
+
+        public Core.User.User ToUser()
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                FirstName = FirstName,
+                LastName = LastName,
+                Email = Email.FormatLower(),
+                PhoneNumber = PhoneNumber,
+                Password = Password,
+                Salt = String.Empty,
+                Roles = [ 
+                    UserRoles.User 
+                ],
+                IsActive = true,
+                IsAuthorized = true,
+                PasswordAttempts = 0,
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow
+            };
         }
     }
 }

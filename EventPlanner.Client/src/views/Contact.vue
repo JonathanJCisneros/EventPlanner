@@ -60,7 +60,8 @@
     import type {
         FormResponse,
         Errors,
-        ValidationResponse
+        ValidationResponse,
+        ServerValidationResponse
     } from '../assets/js/types.ts';
 
     import validations from '../assets/js/validations.ts';
@@ -98,24 +99,36 @@
         },
         methods: {
             async submitInquiry(attempts: number = 0): Promise<void> {
+                if (Object.keys(this.formMessages).length > 0) {
+                    this.formMessages = {};
+                }
+
                 if (this.isFormValid()) {
-                    await fetch('https://localhost:7134/api/contact/submitcontact', {
+                    await fetch('https://localhost:7134/api/contact/submitinquiry', {
                         method: 'POST',
                         headers: {
+                            'Accept': 'application/json',
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): Promise<FormResponse> => {
-                            if (!response.ok) {
-                                return null;
-                            }
+                        .then(async (response: Response): Promise<ServerValidationResponse | FormResponse> => await response.json())
+                        .then(async (data: ServerValidationResponse | FormResponse): Promise<void> => {
+                            if (data.hasOwnProperty('errors')) {
+                                const temp: Errors = {};
 
-                            return await response.json();
-                        })
-                        .then(async (data: null | FormResponse): Promise<void> => {
-                            if (!data) {
-                                await this.handleFail(attempts);
+                                Object.keys(data.errors).forEach(key => {
+                                    if (data.errors[key].length > 0) {
+                                        temp[key] = data.errors[key][0];
+                                    }
+                                });
+
+                                this.formMessages = temp;
+
+                                return;
+                            }
+                            else if (!data.success) {
+                                this.stateMessage = data.message;
 
                                 return;
                             }
@@ -125,7 +138,18 @@
                         .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            await this.handleFail(attempts);
+                            attempts++;
+
+                            if (attempts < 2) {
+                                await this.submitInquiry(attempts);
+
+                                return;
+                            }
+
+                            this.stateMessage = {
+                                success: false,
+                                message: 'Oops, we are having trouble submitting your message. Please try again later!'
+                            };
                         });                    
                 }
             },
@@ -155,20 +179,6 @@
                 }
 
                 return true;
-            },
-            async handleFail(attempts: number): Promise<void> {
-                attempts++;
-
-                if (attempts < 2) {
-                    await this.submitInquiry(attempts);
-
-                    return;
-                }
-
-                this.stateMessage = {
-                    success: false,
-                    message: 'Oops, we are having trouble submitting your message. Please try again later!'
-                };
             }
         }
     });

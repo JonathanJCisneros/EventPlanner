@@ -7,23 +7,11 @@ import {
     type Router
 } from 'vue-router';
 
-import Home from '../views/home/Home.vue';
-import Error from '../views/home/Error.vue';
-
-import Weddings from '../views/services/Weddings.vue';
-import Birthdays from '../views/services/Birthdays.vue';
-import Business from '../views/services/Business.vue';
-
-import Events from '../views/events/Events.vue';
-import NewEvent from '../views/events/NewEvent.vue';
-import ViewEvent from '../views/events/ViewEvent.vue';
-import EditEvent from '../views/events/EditEvent.vue';
-
-import Login from '../views/user/Login.vue';
-import Register from '../views/user/Register.vue';
-import Account from '../views/user/Account.vue';
-
-import Contact from '../views/Contact.vue';
+interface Meta {
+    title: string,
+    description: string,
+    keywords: string[]
+}
 
 const router: Router = createRouter({
     history: createWebHistory(),
@@ -31,7 +19,7 @@ const router: Router = createRouter({
         {
             path: '/',
             name: 'Home',
-            component: Home,
+            component: () => import('../views/home/Home.vue'),
             meta: {
                 authorize: false,
                 layout: {
@@ -43,43 +31,49 @@ const router: Router = createRouter({
         {
             path: '/services/weddings',
             name: 'Weddings',
-            component: Weddings,
+            component: () => import('../views/services/Weddings.vue'),
             meta: {
                 authorize: false,
                 layout: {
                     header: 'standard',
                     footer: 'standard'
-                }
+                },
+                description: 'Our wedding planning is top notch! We will help with anything from choosing the venue with our partners to helping cater!',
+                keywords: ['weddings, wedding planning']
             }
         },
         {
             path: '/services/birthdays',
             name: 'Birthdays',
-            component: Birthdays,
+            component: () => import('../views/services/Birthdays.vue'),
             meta: {
                 authorize: false,
                 layout: {
                     header: 'standard',
                     footer: 'standard'
-                }
+                },
+                description: 'Our birthday planning is top notch! We will help with anything from choosing the venue with our partners to helping cater!',
+                keywords: ['birthdays, birthday planning']
             }
         },
         {
             path: '/services/business',
             name: 'Business',
-            component: Business,
+            component: () => import('../views/services/Business.vue'),
             meta: {
                 authorize: false,
                 layout: {
                     header: 'standard',
                     footer: 'standard'
-                }
+                },
+                description: 'Our business planning is top notch! We will help with anything from choosing the venue with our partners to helping cater!',
+                keywords: ['weddings, wedding planning']
             }
         },
         {
             path: '/events',
             name: 'Events',
-            component: Events,
+            component: () => import('../views/events/Events.vue'),
             meta: {
                 authorize: true,
                 layout: {
@@ -91,7 +85,7 @@ const router: Router = createRouter({
         {
             path: '/events/new',
             name: 'New Event',
-            component: NewEvent,
+            component: () => import('../views/events/NewEvent.vue'),
             meta: {
                 authorize: true,
                 layout: {
@@ -103,7 +97,7 @@ const router: Router = createRouter({
         {
             path: '/events/:id',
             name: 'View Event',
-            component: ViewEvent,
+            component: () => import('../views/events/ViewEvent.vue'),
             meta: {
                 authorize: true,
                 layout: {
@@ -115,7 +109,7 @@ const router: Router = createRouter({
         {
             path: '/events/:id/edit',
             name: 'Edit Event',
-            component: EditEvent,
+            component: () => import('../views/events/EditEvent.vue'),
             meta: {
                 authorize: true,
                 layout: {
@@ -127,7 +121,7 @@ const router: Router = createRouter({
         {
             path: '/user/login',
             name: 'Login',
-            component: Login,
+            component: () => import('../views/user/Login.vue'),
             meta: {
                 hideFromAuth: true,
                 layout: {
@@ -139,7 +133,7 @@ const router: Router = createRouter({
         {
             path: '/user/register',
             name: 'Register',
-            component: Register,
+            component: () => import('../views/user/Register.vue'),
             meta: {
                 hideFromAuth: true,
                 layout: {
@@ -151,7 +145,7 @@ const router: Router = createRouter({
         {
             path: '/user/account',
             name: 'Account',
-            component: Account,
+            component: () => import('../views/user/Account.vue'),
             meta: {
                 authorize: true,
                 layout: {
@@ -163,7 +157,7 @@ const router: Router = createRouter({
         {
             path: '/contact',
             name: 'Contact',
-            component: Contact,
+            component: () => import('../views/Contact.vue'),
             meta: {
                 authorize: false,
                 layout: {
@@ -175,7 +169,7 @@ const router: Router = createRouter({
         {
             path: '/:catchAll(.*)',
             name: 'Error',
-            component: Error,
+            component: () => import('../views/home/Error.vue'),
             meta: {
                 authorize: false,
                 layout: {
@@ -186,6 +180,12 @@ const router: Router = createRouter({
         }
     ]
 });
+
+const defaultMeta: Meta = {
+    title: 'Event Planner',
+    description: 'Welcome to Event Planner! The easiest way to plan events and coordinate with multiple hosts and your guest list.',
+    keywords: ['event planner', 'event planning']
+}
 
 router.beforeEach(async (to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): Promise<void> => {
     if (to.meta.hasOwnProperty('authorize') &&
@@ -203,13 +203,37 @@ router.beforeEach(async (to: RouteLocationNormalizedGeneric, from: RouteLocation
         next('/user/account');
     }
 
-    let title: string = 'Event Panner';
+    let title: string = defaultMeta.title;
 
-    if (to.name && typeof to.name === 'string') {
-        title = `${to.name} - ${title}`;
+    if (to.name) {
+        title = `${to.name as string} - ${title}`;
     }
 
     document.title = title;
+
+    let description: string = defaultMeta.description;
+
+    if (to.meta.hasOwnProperty('description')) {
+        description = to.meta.description as string;
+    }
+
+    const descriptionTag: Element | null = document.querySelector('meta[name="description"]');
+
+    if (descriptionTag) {
+        descriptionTag.setAttribute('content', description);
+    }
+
+    let keywords: string = defaultMeta.keywords.join(', ');
+
+    if (to.meta.hasOwnProperty('keywords')) {
+        keywords = (to.meta.keywords as string[]).join(', ');
+    }
+
+    const keywordsTag: Element | null = document.querySelector('meta[name="keywords"]');
+
+    if (keywordsTag) {
+        keywordsTag.setAttribute('content', keywords);
+    }
 
     next();
 });

@@ -44,45 +44,44 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
+    import { defineComponent, defineAsyncComponent } from 'vue';
     import { RouterLink } from 'vue-router';
     import router from '../../routes/routes.ts';
-    import Notifications from '../../components/Notifications.vue';
 
     interface Data {
         opened: boolean
     }
 
     export default defineComponent({
-        data() {
+        data(): Data {
             return {
                 opened: false
             };
         },
         components: {
-            Notifications
+            Notifications: defineAsyncComponent(() => import('../../components/Notifications.vue'))
         },
         computed: {
             isLoggedIn: function (): boolean {
                 return localStorage.getItem('user_auth') && localStorage.getItem('jwt');
             }
         },
-        mounted() {
+        mounted(): void {
             document.addEventListener('click', this.close)
         },
-        beforeDestroy() {
+        beforeDestroy(): void {
             document.removeEventListener('click', this.close)
         },
         methods: {
-            close(e) {
+            close(e): void {
                 if (this.opened && !['opened', 'dropdown', 'dropdown-item'].some(x => e.target.classList.contains(x))) {
                     this.opened = false
                 }
             },
-            handleDropdown() {
+            handleDropdown(): void {
                 this.opened = !this.opened;
             },
-            logout() {
+            logout(): void {
                 localStorage.removeItem('user_auth');
                 localStorage.removeItem('jwt');
 

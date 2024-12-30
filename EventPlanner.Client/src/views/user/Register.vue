@@ -1,7 +1,7 @@
 <template>
     <Title title="Register" />
     <div class="register">
-        <div v-if="stateMessage" :class="error">{{ stateMessage.message }}</div>
+        <div v-if="stateMessage" class="error">{{ stateMessage.message }}</div>
         <form v-on:submit.prevent="submitRegister">
             <div>
                 <label for="firstName">First Name</label>
@@ -51,7 +51,8 @@
     import type {
         FormResponse,
         Errors,
-        ValidationResponse
+        ValidationResponse,
+        ServerValidationResponse
     } from '../../assets/js/types.ts';
 
     import validations from '../../assets/js/validations.ts';
@@ -91,7 +92,11 @@
             RouterLink
         },
         methods: {
-            async submitRegister(): Promise<void> {
+            async submitRegister(attempts = 0): Promise<void> {
+                if (Object.keys(this.formMessages).length > 0) {
+                    this.formMessages = {};
+                }
+
                 if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/user/register', {
                         method: 'POST',
@@ -101,21 +106,22 @@
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): Promise<null | FormResponse> => {
-                            if (!response.ok) {
-                                return null;
-                            }
+                        .then(async (response: Response): Promise<ServerValidationResponse | FormResponse> => await response.json())
+                        .then(async (data: ServerValidationResponse | FormResponse): Promise<void> => {
+                            if (data.hasOwnProperty('errors')) {
+                                const temp: Errors = {};
 
-                            return await response.json();
-                        })
-                        .then(async (response: null | FormResponse): Promise<void> => {
-                            if (!data) {
-                                await this.handleFail(attempts);
+                                Object.keys(data.errors).forEach(key => {
+                                    if (data.errors[key].length > 0) {
+                                        temp[key] = data.errors[key][0];
+                                    }
+                                });
+
+                                this.formMessages = temp;
 
                                 return;
                             }
-
-                            if (!data.success) {
+                            else if (!data.success) {
                                 this.stateMessage = data.message;
 
                                 return;
@@ -126,7 +132,18 @@
                         .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            await this.handleFail(attempts);
+                            attempts++;
+
+                            if (attempts < 2) {
+                                await this.submitRegister(attempts);
+
+                                return;
+                            }
+
+                            this.stateMessage = {
+                                success: false,
+                                message: 'Oops, we are having trouble registering. Please try again later!'
+                            };
                         });
                 }
             },
@@ -145,7 +162,7 @@
                 this.formDetails.email = emailValidation.value;
                 errors = emailValidation.errors;
 
-                const phoneNumberValidation: ValidationResponse<string> = vallidations.phoneNumber(this.formDetails.phoneNumber, errors);
+                const phoneNumberValidation: ValidationResponse<string> = validations.phoneNumber(this.formDetails.phoneNumber, errors);
                 this.formDetails.phoneNumber = phoneNumberValidation.value;
                 errors = phoneNumberValidation.errors;
 
@@ -164,20 +181,6 @@
                 }
 
                 return true;
-            },
-            async handleFail(attempts: number): Promise<void> {
-                attempts++;
-
-                if (attempts < 2) {
-                    await this.submitRegister(attempts);
-
-                    return;
-                }
-
-                this.stateMessage = {
-                    success: false,
-                    message: 'Oops, we are having trouble registering. Please try again later!'
-                };
             },
             formatNumber(): void {
                 if (this.formDetails.phoneNumber) {

@@ -10,12 +10,9 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
+    import { defineComponent, defineAsyncComponent } from 'vue';
     import { RouterView } from 'vue-router';
     import router from './routes/routes.ts';
-    import Header from './components/layouts/Header.vue';
-    import MinimalHeader from './components/layouts/MinimalHeader.vue';
-    import Footer from './components/layouts/Footer.vue';
 
     type Layout = {
         header: string,
@@ -24,9 +21,9 @@
 
     export default defineComponent({
         components: {
-            Header,
-            MinimalHeader,
-            Footer
+            Header: defineAsyncComponent(() => import('./components/layouts/Header.vue')),
+            MinimalHeader: defineAsyncComponent(() => import('./components/layouts/MinimalHeader.vue')),
+            Footer: defineAsyncComponent(() => import('./components/layouts/Footer.vue'))
         },
         computed: {
             layout: (): Layout => router.currentRoute.value.meta.layout

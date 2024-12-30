@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventPlanner.Core;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.API.Models.Forms.Contact
 {
@@ -16,7 +17,7 @@ namespace EventPlanner.API.Models.Forms.Contact
         public required string Email { get; set; }
 
         [Required(ErrorMessage = "Subject is required")]
-        public InquiryType Subject { get; set; }
+        public InquirySubject Subject { get; set; }
 
         [Required(ErrorMessage = "Message is required")]
         [MinLength(5, ErrorMessage = "Message must be at least 5 characters")]
@@ -31,13 +32,19 @@ namespace EventPlanner.API.Models.Forms.Contact
 
             return this;
         }
-    }
 
-    public enum InquiryType
-    {
-        Question,
-        SpecialEvent,
-        Partnership,
-        Ideas
+        public Inquiry ToInquiry()
+        {
+            return new()
+            {
+                Id = Guid.NewGuid(),
+                Name = Name,
+                Email = Email,
+                Subject = Subject,
+                Message = Message,
+                CreatedDate = DateTime.UtcNow,
+                UpdatedDate = DateTime.UtcNow
+            };
+        }
     }
 }

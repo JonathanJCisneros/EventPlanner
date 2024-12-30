@@ -1,5 +1,4 @@
-﻿using Microsoft.Net.Http.Headers;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace EventPlanner.API.Models

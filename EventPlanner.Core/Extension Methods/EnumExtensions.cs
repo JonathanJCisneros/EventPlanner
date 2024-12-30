@@ -6,7 +6,7 @@ namespace EventPlanner.Core.Extension_Methods
 {
     public static class EnumExtensions
     {
-        public static string GetDisplayName(this Enum enumValue)
+        public static string? GetDisplayName(this Enum enumValue)
         {
             return enumValue.GetType()
               .GetMember(enumValue.ToString())
@@ -25,13 +25,23 @@ namespace EventPlanner.Core.Extension_Methods
                 {
                     if (attribute.Name == name)
                     {
-                        return (T)field.GetValue(null);
+                        object? value = field.GetValue(null);
+
+                        if (value != null)
+                        {
+                            return (T)value;
+                        }
                     }
                 }
 
                 if (field.Name == name)
                 {
-                    return (T)field.GetValue(null);
+                    object? value = field.GetValue(null);
+
+                    if (value != null)
+                    {
+                        return (T)value;
+                    }
                 }
             }
 
@@ -65,14 +75,24 @@ namespace EventPlanner.Core.Extension_Methods
                 {
                     if (attribute.Description == description)
                     {
-                        return (T)field.GetValue(null);
+                        object? value = field.GetValue(null);
+
+                        if (value != null)
+                        {
+                            return (T)value;
+                        }
                     }
                 }
                 else
                 {
                     if (field.Name == description)
                     {
-                        return (T)field.GetValue(null);
+                        object? value = field.GetValue(null);
+
+                        if (value != null)
+                        {
+                            return (T)value;
+                        }
                     }
                 }
             }

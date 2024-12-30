@@ -6,7 +6,9 @@
 
         public string? Name { get; set; }
 
-        public UserRole[]? Roles { get; set; }
+        public string? Email { get; set; }
+
+        public UserRoles[]? Roles { get; set; }
 
         public bool PasswordMatched { get; set; }
 
@@ -16,8 +18,13 @@
 
         public bool IsAuthorized
         {
-            get => Id != null && PasswordMatched && !LockedOut;
+            get
+            {
+                return Id != null && PasswordMatched && !LockedOut;
+            }
         }
+
+        public string? Message { get; set; }
 
         public AuthorizeResult()
         {
@@ -29,6 +36,7 @@
         {
             Id = user.Id;
             Name = $"{user.FirstName} {user.LastName}";
+            Email = user.Email;
             Roles = user.Roles;
             LockedOut = user.IsActive && !user.IsAuthorized;
         }

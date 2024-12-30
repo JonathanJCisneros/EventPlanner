@@ -11,7 +11,6 @@ export type Errors = {
     PhoneNumber?: string,
     Password?: string,
     ConfirmPassword?: string,
-    Birthday?: string,
     Subject?: string,
     Message?: string
 }
@@ -19,4 +18,22 @@ export type Errors = {
 export type ValidationResponse<T> = {
     value: T,
     errors: Errors
+}
+
+export type ServerValidationResponse = {
+    errors: {
+        FirstName?: string[],
+        LastName?: string[],
+        Name?: string[],
+        Email?: string[],
+        PhoneNumber?: string[],
+        Password?: string[],
+        ConfirmPassword?: string[],
+        Subject?: string[],
+        Message?: string[]
+    },
+    status: number,
+    title: string,
+    traceId: string,
+    type: string
 }

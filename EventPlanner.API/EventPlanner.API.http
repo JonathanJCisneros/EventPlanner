@@ -4,8 +4,14 @@ GET {{EventPlanner.Server_HostAddress}}/weatherforecast/
 Accept: application/json
 ###
 
+POST {{EventPlanner.Server_HostAddress}}/user/register
+Accept: application/json
+Content-Type: application/json
+Body: "{}"
+###
+
 POST {{EventPlanner.Server_HostAddress}}/contact/submitinquiry
 Accept: application/json
 Content-Type: application/json
-Body: "{  }"
+Body: "{}"
 ###

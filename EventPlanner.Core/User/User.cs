@@ -8,9 +8,13 @@
 
         public required string Email { get; set; }
 
+        public required string PhoneNumber { get; set; }
+
         public required string Password { get; set; }
 
-        public required UserRole[] Roles { get; set; }
+        public required string Salt { get; set; }
+
+        public required UserRoles[] Roles { get; set; }
 
         public bool IsAuthorized { get; set; }
 
@@ -21,11 +25,5 @@
         public DateTime LastLoggedIn { get; set; }
 
         public DateTime? LastLoggedOut { get; set; }
-    }
-
-    public enum UserRole
-    {
-        Admin,
-        User
-    }
+    }    
 }

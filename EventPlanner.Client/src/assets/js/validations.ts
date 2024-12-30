@@ -136,7 +136,7 @@ const validations: Validations = {
         else if (password.length > 128) {
             errors['Password'] = 'Password can be no more than 128 characters long';
         }
-        else if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/g.test(password)) {
+        else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/g.test(password)) {
             errors['Password'] = 'Password must have at least one upper case character, one lowercase character, one number and one special character';
         }
         else {

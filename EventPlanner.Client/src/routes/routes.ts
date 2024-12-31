@@ -188,18 +188,13 @@ const defaultMeta: Meta = {
 }
 
 router.beforeEach(async (to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): Promise<void> => {
-    if (to.meta.hasOwnProperty('authorize') &&
-        to.meta.authorize &&
-        !localStorage.getItem('user_auth')
-    ) {
+    const loggedIn: boolean = localStorage.getItem('user_token') !== null;
+
+    if (to.meta.hasOwnProperty('authorize') && to.meta.authorize && !loggedIn) {
         next('/user/login');
         return;
     }
-    else if (
-        to.meta.hasOwnProperty('hideFromAuth') &&
-        to.meta.hideFromAuth &&
-        localStorage.getItem('user_auth')
-    ) {
+    else if (to.meta.hasOwnProperty('hideFromAuth') && to.meta.hideFromAuth && loggedIn) {
         next('/user/account');
     }
 

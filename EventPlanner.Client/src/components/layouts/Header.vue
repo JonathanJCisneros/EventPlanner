@@ -63,7 +63,7 @@
         },
         computed: {
             isLoggedIn: function (): boolean {
-                return localStorage.getItem('user_auth') && localStorage.getItem('jwt');
+                return localStorage.getItem('user_token') !== null;
             }
         },
         mounted(): void {
@@ -82,8 +82,7 @@
                 this.opened = !this.opened;
             },
             logout(): void {
-                localStorage.removeItem('user_auth');
-                localStorage.removeItem('jwt');
+                localStorage.removeItem('user_token');
 
                 router.push('/user/login');
             }
@@ -138,10 +137,19 @@
             padding: 14px;
             text-decoration: none;
             display: block;
+            border: 3px solid #333;
         }
 
             nav a:hover {
                 background-color: #575757;
+                border-color: #575757;
+            }
+
+            nav a.router-link-active {
+                background-color: white;
+                color: #333;
+                font-weight: 600;
+                pointer-events: none;
             }
 
         .opened svg {

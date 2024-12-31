@@ -1,4 +1,8 @@
-import type { Errors, ValidationResponse } from './types.ts';
+import type {
+    Errors,
+    ValidationResponse,
+    ServerValidationResponse
+} from './types.ts';
 
 const isEmpty = (value: string): boolean => !value || /^\s$/g.test(value);
 
@@ -27,7 +31,7 @@ interface Validations {
     message(message: string, errors: Errors): ValidationResponse<string>
 }
 
-const validations: Validations = {
+export const validations: Validations = {
     firstName(name: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(name)) {
             errors['FirstName'] = 'First Name is required';
@@ -89,7 +93,7 @@ const validations: Validations = {
         return {
             value: name,
             errors: errors
-        }
+        };
     },
     email(email: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(email)) {
@@ -108,7 +112,7 @@ const validations: Validations = {
         return {
             value: email,
             errors: errors
-        }
+        };
     },
     phoneNumber(number: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(number)) {
@@ -124,7 +128,7 @@ const validations: Validations = {
         return {
             value: number,
             errors: errors
-        }
+        };
     },
     password(password: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(password)) {
@@ -146,7 +150,7 @@ const validations: Validations = {
         return {
             value: password,
             errors: errors
-        }
+        };
     },
     confirmPassword(password: string, confirmPassword: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(confirmPassword)) {
@@ -159,7 +163,7 @@ const validations: Validations = {
         return {
             value: confirmPassword,
             errors: errors
-        }
+        };
     },
     subject(subject: number, errors: Errors): ValidationResponse<number> {
         if (subject < 0) {
@@ -169,7 +173,7 @@ const validations: Validations = {
         return {
             value: subject,
             errors: errors
-        }
+        };
     },
     message(message: string, errors: Errors): ValidationResponse<string> {
         if (isEmpty(message)) {
@@ -190,8 +194,18 @@ const validations: Validations = {
         return {
             value: message,
             errors: errors
-        }
+        };
     }    
 }
 
-export default validations;
+export const buildServerValidations = (serverResponse: ServerValidationResponse): Errors => {
+    const errors: Errors = {};
+
+    Object.keys(serverResponse.errors).forEach(key => {
+        if (Array.isArray(serverResponse.errors[key])) {
+            errors[key] = serverResponse.errors[key][0];
+        }
+    });
+
+    return errors;
+};

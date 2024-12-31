@@ -49,13 +49,13 @@
     import router from '../../routes/routes.ts';
 
     import type {
-        FormResponse,
+        UserFormResponse,
         Errors,
         ValidationResponse,
         ServerValidationResponse
     } from '../../assets/js/types.ts';
 
-    import validations from '../../assets/js/validations.ts';
+    import { validations, buildServerValidations } from '../../assets/js/validations.ts';
 
     type FormDetails = {
         firstName: string,
@@ -69,7 +69,7 @@
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
-        stateMessage: null | FormResponse
+        stateMessage: null | UserFormResponse
     };
 
     export default defineComponent({
@@ -92,7 +92,7 @@
             RouterLink
         },
         methods: {
-            async submitRegister(attempts = 0): Promise<void> {
+            async submitRegister(attempts: number = 0): Promise<void> {
                 if (Object.keys(this.formMessages).length > 0) {
                     this.formMessages = {};
                 }
@@ -106,23 +106,15 @@
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): Promise<ServerValidationResponse | FormResponse> => await response.json())
-                        .then(async (data: ServerValidationResponse | FormResponse): Promise<void> => {
+                        .then(async (response: Response): Promise<ServerValidationResponse | UserFormResponse> => await response.json())
+                        .then(async (data: ServerValidationResponse | UserFormResponse): Promise<void> => {
                             if (data.hasOwnProperty('errors')) {
-                                const temp: Errors = {};
-
-                                Object.keys(data.errors).forEach(key => {
-                                    if (data.errors[key].length > 0) {
-                                        temp[key] = data.errors[key][0];
-                                    }
-                                });
-
-                                this.formMessages = temp;
+                                this.formMessages = buildServerValidations(data as ServerValidationResponse);
 
                                 return;
                             }
                             else if (!data.success) {
-                                this.stateMessage = data;
+                                this.stateMessage = data as UserFormResponse;
 
                                 return;
                             }
@@ -134,7 +126,9 @@
                                 phoneNumber: '',
                                 password: '',
                                 confirmPassword: ''
-                            };
+                            } as FormDetails;
+
+                            localStorage.setItem('user_token', data.token);
 
                             router.push('/user/account');
                         })
@@ -152,7 +146,7 @@
                             this.stateMessage = {
                                 success: false,
                                 message: 'Oops, we are having trouble registering. Please try again later!'
-                            };
+                            } as UserFormResponse;
                         });
                 }
             },
@@ -233,6 +227,7 @@
                 color: #dc3545;
                 font-size: 0.8rem;
                 font-weight: 600;
+                text-align: center;
             }
 
     label {

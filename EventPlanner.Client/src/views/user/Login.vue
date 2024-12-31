@@ -6,12 +6,12 @@
             <div>
                 <label for="email">Email</label>
                 <input type="text" id="email" name="email" v-model="formDetails.email" />
-                <span v-if="formMessages.hasOwnProperty('email')">{{ formMessages.email }}</span>
+                <span v-if="formMessages.hasOwnProperty('Email')">{{ formMessages.Email }}</span>
             </div>
             <div>
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" v-model="formDetails.password" />
-                <span v-if="formMessages.hasOwnProperty('password')">{{ formMessages.password }}</span>
+                <span v-if="formMessages.hasOwnProperty('Password')">{{ formMessages.Password }}</span>
             </div>
             <div>
                 <button type="submit" class="button success">Login</button>
@@ -29,12 +29,12 @@
     import router from '../../routes/routes.ts';
 
     import type {
-        FormResponse,
+        UserFormResponse,
         Errors,
         ValidationResponse
     } from '../../assets/js/types.ts';
 
-    import validations from '../../assets/js/validations.ts';    
+    import { validations, buildServerValidations } from '../../assets/js/validations.ts';    
 
     type FormDetails = {
         email: string,
@@ -44,7 +44,7 @@
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
-        stateMessage: null | FormResponse
+        stateMessage: null | UserFormResponse
     };
 
     export default defineComponent({
@@ -63,7 +63,11 @@
             RouterLink
         },
         methods: {
-            async submitLogin(): Promise<void> {
+            async submitLogin(attempts: number = 0): Promise<void> {
+                if (Object.keys(this.formMessages).length > 0) {
+                    this.formMessages = {};
+                }
+
                 if (this.isFormValid()) {
                     await fetch('https://localhost:7134/api/user/login', {
                         method: 'POST',
@@ -73,22 +77,15 @@
                         },
                         body: JSON.stringify(this.formDetails)
                     })
-                        .then(async (response: Response): Promise<null | FormResponse> => {
-                            if (!response.ok) {
-                                return null;
-                            }
-
-                            return await response.json();
-                        })
-                        .then(async (data: null | FormResponse): Promise<void> => {
-                            if (!data) {
-                                await this.handleFail(attempts);
+                        .then(async (response: Response): Promise<ServerValidationResponse | UserFormResponse> => await response.json())
+                        .then(async (data: ServerValidationResponse | UserFormResponse): Promise<void> => {
+                            if (data.hasOwnProperty('errors')) {
+                                this.formMessages = buildServerValidations(data as ServerValidationResponse);
 
                                 return;
                             }
-
-                            if (!data.success) {
-                                this.stateMessage = data;
+                            else if (!data.success) {
+                                this.stateMessage = data as UserFormResponse;
 
                                 return;
                             }
@@ -96,14 +93,27 @@
                             this.formDetails = {
                                 email: '',
                                 password: ''
-                            };
+                            } as FormDetails;
+
+                            localStorage.setItem('user_token', data.token);
 
                             router.push('/user/account');
                         })
                         .catch(async (error: Error): Promise<void> => {
                             console.log(error);
 
-                            await this.handleFail(attempts);
+                            attempts++;
+
+                            if (attempts < 2) {
+                                await this.submitLogin(attempts);
+
+                                return;
+                            }
+
+                            this.stateMessage = {
+                                success: false,
+                                message: 'Oops, we are having trouble logging you in. Please try again later!'
+                            } as UserFormResponse;
                         });
                 }
             },
@@ -125,20 +135,6 @@
                 }
 
                 return true;
-            },
-            async handleFail(attempts: number): Promise<void> {
-                attempts++;
-
-                if (attempts < 2) {
-                    await this.submitLogin(attempts);
-
-                    return;
-                }
-
-                this.stateMessage = {
-                    success: false,
-                    message: 'Oops, we are having trouble logging you in. Please try again later!'
-                };
             }
         }
     });
@@ -176,6 +172,7 @@
                 color: #dc3545;
                 font-size: 0.8rem;
                 font-weight: 600;
+                text-align: center;
             }
 
     label {

@@ -64,7 +64,7 @@
         ServerValidationResponse
     } from '../assets/js/types.ts';
 
-    import validations from '../assets/js/validations.ts';
+    import { validations, buildServerValidations } from '../assets/js/validations.ts';
 
     type FormDetails = {
         name: string,
@@ -115,26 +115,24 @@
                         .then(async (response: Response): Promise<ServerValidationResponse | FormResponse> => await response.json())
                         .then(async (data: ServerValidationResponse | FormResponse): Promise<void> => {
                             if (data.hasOwnProperty('errors')) {
-                                const temp: Errors = {};
-
-                                Object.keys(data.errors).forEach(key => {
-                                    if (data.errors[key].length > 0) {
-                                        temp[key] = data.errors[key][0];
-                                    }
-                                });
-
-                                this.formMessages = temp;
+                                this.formMessages = buildServerValidations(data as ServerValidationResponse);
 
                                 return;
                             }
                             else if (!data.success) {
-                                this.stateMessage = data.message;
+                                this.stateMessage = data as FormResponse;
 
                                 return;
                             }
 
-                            this.formDetails = {};
-                            this.stateMessage = data;
+                            this.formDetails = {
+                                name: '',
+                                email: '',
+                                subject: -1,
+                                message: ''
+                            } as FormDetails;
+
+                            this.stateMessage = data as FormResponse;
                         })
                         .catch(async (error: Error): Promise<void> => {
                             console.log(error);
@@ -150,7 +148,7 @@
                             this.stateMessage = {
                                 success: false,
                                 message: 'Oops, we are having trouble submitting your message. Please try again later!'
-                            };
+                            } as FormResponse;
                         });                    
                 }
             },
@@ -276,6 +274,7 @@
                 color: #dc3545;
                 font-size: 0.8rem;
                 font-weight: 600;
+                text-align: center;
             }
 
     label {

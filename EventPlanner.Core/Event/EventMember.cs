@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.Event
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.Event
 {
-    public class EventMember : Base
+    public class EventMember : BaseEntity
     {
         public MemberType Type { get; set; }
 

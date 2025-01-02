@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.Notification
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.Notification
 {
-    public class Recipient : Base
+    public class Recipient : BaseEntity
     {
         public NotificiationStatus Status { get; set; }
 

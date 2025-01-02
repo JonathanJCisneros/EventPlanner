@@ -1,6 +1,6 @@
-﻿namespace EventPlanner.Core
+﻿namespace EventPlanner.Core.Base
 {
-    public abstract class Base
+    public abstract class BaseEntity
     {
         public Guid Id { get; set; }
 

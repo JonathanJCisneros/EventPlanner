@@ -6,7 +6,7 @@ namespace EventPlanner.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class HomeController : ControllerBase
+    public class HomeController : BaseController
     {
         #region Fields
 

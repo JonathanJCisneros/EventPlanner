@@ -1,4 +1,5 @@
-﻿using EventPlanner.Core.Event;
+﻿using EventPlanner.Core.Base;
+using EventPlanner.Core.Event;
 
 namespace EventPlanner.Service.Interfaces
 {

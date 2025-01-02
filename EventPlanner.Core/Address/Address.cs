@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.Address
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.Address
 {
-    public class Address : Base
+    public class Address : BaseEntity
     {
         public required string Name { get; set; }
 

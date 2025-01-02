@@ -14,11 +14,22 @@
                 <span v-if="formMessages.hasOwnProperty('Password')">{{ formMessages.Password }}</span>
             </div>
             <div>
-                <button type="submit" class="button success">Login</button>
+                <button type="submit" class="button success" :class="{ 'disabled': loggingIn }">
+                    <template v-if="!loggingIn">
+                        Login
+                    </template>
+                    <template v-else>
+                        <span class="loader"></span>
+                    </template>
+                </button>
             </div>
         </form>
         <div class="or-separator">Or</div>
-        <RouterLink class="button primary" to="/user/register">Register</RouterLink>
+        <RouterLink class="button primary"
+                    :class="{ 'disabled': loggingIn }"
+                    to="/user/register">
+            Register
+        </RouterLink>
     </div>
 </template>
 
@@ -31,7 +42,8 @@
     import type {
         UserFormResponse,
         Errors,
-        ValidationResponse
+        ValidationResponse,
+        ServerValidationResponse
     } from '../../assets/js/types.ts';
 
     import { validations, buildServerValidations } from '../../assets/js/validations.ts';    
@@ -44,7 +56,8 @@
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
-        stateMessage: null | UserFormResponse
+        stateMessage: null | UserFormResponse,
+        loggingIn: boolean
     };
 
     export default defineComponent({
@@ -55,7 +68,8 @@
                     password: ''
                 },
                 formMessages: {},
-                stateMessage: null
+                stateMessage: null,
+                loggingIn: false
             };
         },
         components: {
@@ -69,6 +83,8 @@
                 }
 
                 if (this.isFormValid()) {
+                    this.loggingIn = true;
+
                     await fetch('https://localhost:7134/api/user/login', {
                         method: 'POST',
                         headers: {
@@ -81,11 +97,13 @@
                         .then(async (data: ServerValidationResponse | UserFormResponse): Promise<void> => {
                             if (data.hasOwnProperty('errors')) {
                                 this.formMessages = buildServerValidations(data as ServerValidationResponse);
+                                this.loggingIn = false;
 
                                 return;
                             }
                             else if (!data.success) {
                                 this.stateMessage = data as UserFormResponse;
+                                this.loggingIn = false;
 
                                 return;
                             }
@@ -114,6 +132,8 @@
                                 success: false,
                                 message: 'Oops, we are having trouble logging you in. Please try again later!'
                             } as UserFormResponse;
+
+                            this.loggingIn = false;
                         });
                 }
             },
@@ -152,6 +172,19 @@
         border: 1px solid #c5c5c5;
         box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.4);
     }
+
+    .loader {
+        margin-left: 3px;
+        height: 14px;
+        width: 14px;
+        border-width: 1.5px;
+    }
+
+        .loader::after {
+            height: 22px;
+            width: 22px;
+            border-width: 1.5px;
+        }
 
     form {
         width: 100%;
@@ -202,11 +235,21 @@
         font-size: 1.15rem;
     }
 
+        button.disabled {
+            pointer-events: none;
+        }
+
     a {
         text-decoration-line: none;
     }
 
         a:hover {
             text-decoration-line: none;
+        }
+
+        a.disabled {
+            border-color: #333;
+            background-color: #333;
+            pointer-events: none;
         }
 </style>

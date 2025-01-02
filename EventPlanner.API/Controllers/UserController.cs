@@ -13,7 +13,7 @@ namespace EventPlanner.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         #region Fields
 
@@ -43,7 +43,7 @@ namespace EventPlanner.API.Controllers
                 new Claim(JwtRegisteredClaimNames.Email, result.Email)                
             ];
 
-            if (result.Roles != null && result.Roles.Count() > 0)
+            if (result.Roles != null && result.Roles.Length > 0)
             {
                 claims.Add(new Claim(JwtRegisteredClaimNames.Typ, String.Join(',', result.Roles.Select(x => EnumExtensions.GetDisplayName(x)))));
             }

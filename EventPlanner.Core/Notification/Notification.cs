@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.Notification
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.Notification
 {
-    public class Notification : Base
+    public class Notification : BaseEntity
     {
         public required string Title { get; set; }
 

@@ -1,4 +1,4 @@
-﻿namespace EventPlanner.Repository.Interfaces
+﻿namespace EventPlanner.Core.Base
 {
     public interface IBaseInterface<T> where T : class
     {

@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventPlanner.Core.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace EventPlanner.Core
 {
-    public class Inquiry : Base
+    public class Inquiry : BaseEntity
     {
         public required string Name { get; set; }
 

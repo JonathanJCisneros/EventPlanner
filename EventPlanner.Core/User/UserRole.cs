@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.User
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.User
 {
-    public class UserRole : Base
+    public class UserRole : BaseEntity
     {
         public UserRoles Role { get; set; }
 

@@ -67,11 +67,11 @@
         altText: string,
         createdDate: Date,
         updatedDare: Date
-    }[]
+    }
 
     interface Data {
         loading: boolean,
-        content: ImageContent
+        content: ImageContent[]
     }
 
     export default defineComponent({
@@ -101,14 +101,14 @@
                         'Content-Type': 'application/json'
                     }
                 })
-                    .then(async (response: Response): Promise<null | ImageContent> => {
+                    .then(async (response: Response): Promise<null | ImageContent[]> => {
                         if (!response.ok) {
                             return null;
                         }
 
-                        return await response.json();
+                        return await response.json() as ImageContent[];
                     })
-                    .then(async (data: null | ImageContent): Promise<void> => {
+                    .then(async (data: null | ImageContent[]): Promise<void> => {
                         if (!data) {
                             await this.handleFail(attempts);
 
@@ -116,7 +116,7 @@
                         }
 
                         this.loading = false;
-                        this.content = data;
+                        this.content = data as ImageContent[];
                     })
                     .catch(async (error: Error): Promise<void> => {
                         console.log(error);

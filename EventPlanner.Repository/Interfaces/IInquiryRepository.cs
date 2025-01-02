@@ -1,4 +1,5 @@
 ﻿using EventPlanner.Core;
+using EventPlanner.Core.Base;
 
 namespace EventPlanner.Repository.Interfaces
 {

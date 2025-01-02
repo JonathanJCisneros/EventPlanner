@@ -232,6 +232,7 @@
                 height: 35px;
                 width: 40px;
                 fill: white;
+                transition: all 250ms ease-in-out;
             }
 
             h6 > a > span {

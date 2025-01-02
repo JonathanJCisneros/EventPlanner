@@ -1,6 +1,6 @@
-﻿namespace EventPlanner.API.Authorization
+﻿namespace EventPlanner.API.Models
 {
-    public class Error
+    public class ErrorModel
     {
         public bool Success 
         {
@@ -12,7 +12,7 @@
 
         public string? Message { get; set; }
 
-        public Error(string message)
+        public ErrorModel(string message)
         {
             Message = message;
         }

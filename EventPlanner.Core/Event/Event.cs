@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.Event
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.Event
 {
-    public class Event : Base
+    public class Event : BaseEntity
     {
         public required string Name { get; set; }
 

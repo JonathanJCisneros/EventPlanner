@@ -155,6 +155,18 @@ const router: Router = createRouter({
             }
         },
         {
+            path: '/user/settings',
+            name: 'Settings',
+            component: () => import('../views/user/Settings.vue'),
+            meta: {
+                authorize: true,
+                layout: {
+                    header: 'standard',
+                    footer: 'standard'
+                }
+            }
+        },
+        {
             path: '/contact',
             name: 'Contact',
             component: () => import('../views/Contact.vue'),

@@ -1,6 +1,8 @@
-﻿namespace EventPlanner.Core.User
+﻿using EventPlanner.Core.Base;
+
+namespace EventPlanner.Core.User
 {
-    public class User : Base
+    public class User : BaseEntity
     {
         public required string FirstName { get; set; }
 

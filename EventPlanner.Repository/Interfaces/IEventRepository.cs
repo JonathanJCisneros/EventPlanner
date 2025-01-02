@@ -1,9 +1,5 @@
-﻿using EventPlanner.Core.Event;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EventPlanner.Core.Base;
+using EventPlanner.Core.Event;
 
 namespace EventPlanner.Repository.Interfaces
 {

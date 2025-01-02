@@ -34,11 +34,22 @@
                 <span v-if="formMessages.hasOwnProperty('ConfirmPassword')">{{ formMessages.ConfirmPassword }}</span>
             </div>
             <div>
-                <button type="submit" class="button success">Register</button>
+                <button type="submit" class="button success">
+                    <template v-if="!registering">
+                        Register
+                    </template>
+                    <template v-else>
+                        <span class="loader"></span>
+                    </template>
+                </button>
             </div>
         </form>
         <div class="or-separator">Or</div>
-        <RouterLink class="button primary" to="/user/login">Login</RouterLink>
+        <RouterLink class="button primary"
+                    :class="{ 'disabled': loggingIn }"
+                    to="/user/login">
+            Login
+        </RouterLink>
     </div>
 </template>
 
@@ -69,7 +80,8 @@
     interface Data {
         formDetails: FormDetails,
         formMessages: Errors,
-        stateMessage: null | UserFormResponse
+        stateMessage: null | UserFormResponse,
+        registering: boolean
     };
 
     export default defineComponent({
@@ -84,7 +96,8 @@
                     confirmPassword: ''
                 },
                 formMessages: {},
-                stateMessage: null
+                stateMessage: null,
+                registering: false
             };
         },
         components: {
@@ -98,6 +111,8 @@
                 }
 
                 if (this.isFormValid()) {
+                    this.registering = true;
+
                     await fetch('https://localhost:7134/api/user/register', {
                         method: 'POST',
                         headers: {
@@ -110,11 +125,13 @@
                         .then(async (data: ServerValidationResponse | UserFormResponse): Promise<void> => {
                             if (data.hasOwnProperty('errors')) {
                                 this.formMessages = buildServerValidations(data as ServerValidationResponse);
+                                this.registering = false;
 
                                 return;
                             }
                             else if (!data.success) {
                                 this.stateMessage = data as UserFormResponse;
+                                this.registering = false;
 
                                 return;
                             }
@@ -147,6 +164,8 @@
                                 success: false,
                                 message: 'Oops, we are having trouble registering. Please try again later!'
                             } as UserFormResponse;
+
+                            this.registering = false;
                         });
                 }
             },
@@ -208,6 +227,19 @@
         box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.4);
     }
 
+    .loader {
+        margin-left: 3px;
+        height: 14px;
+        width: 14px;
+        border-width: 1.5px;
+    }
+
+        .loader::after {
+            height: 22px;
+            width: 22px;
+            border-width: 1.5px;
+        }
+
     form {
         width: 100%;
         display: flex;
@@ -257,11 +289,21 @@
         font-size: 1.15rem;
     }
 
+        button.disabled {
+            pointer-events: none;
+        }
+
     a {
         text-decoration-line: none;
     }
 
         a:hover {
             text-decoration-line: none;
+        }
+
+        a.disabled {
+            border-color: #333;
+            background-color: #333;
+            pointer-events: none;
         }
 </style>

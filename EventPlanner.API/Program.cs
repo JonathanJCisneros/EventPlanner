@@ -53,17 +53,20 @@ builder.Services.AddScoped<IMySqlRepository, MySqlRepository>(x => {
     return new MySqlRepository(builder.Configuration.GetConnectionString("eventPlannerMySql"));
 });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IRecipientRepository, RecipientRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion Repositories
 
 #region Services
 
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IInquiryService, InquiryService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 #endregion Services
 

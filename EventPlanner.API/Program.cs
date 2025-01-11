@@ -14,8 +14,12 @@ builder.Services.AddCors();
 
 builder.Services.AddControllers();
 
-AppSettings settings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
-builder.Services.AddSingleton(settings);
+AppSettings? settings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+
+if (settings != null)
+{
+    builder.Services.AddSingleton(settings);
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -24,16 +28,19 @@ builder.Services.AddAuthentication(options =>
 })
     .AddJwtBearer(options => 
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        if (settings != null)
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = settings.Issuer,
-            ValidAudience = settings.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret))
-        };
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = settings.Issuer,
+                ValidAudience = settings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret))
+            };
+        }        
     });
 
 builder.Services.AddAuthorization();
@@ -53,6 +60,7 @@ builder.Services.AddScoped<IMySqlRepository, MySqlRepository>(x => {
     return new MySqlRepository(builder.Configuration.GetConnectionString("eventPlannerMySql"));
 });
 
+builder.Services.AddScoped<IAddressRepository, AddressRepository>();
 builder.Services.AddScoped<IEventRepository, EventRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -63,9 +71,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #region Services
 
+builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IInquiryService, InquiryService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IRecipientService, RecipientService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 #endregion Services

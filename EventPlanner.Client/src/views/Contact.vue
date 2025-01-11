@@ -62,9 +62,9 @@
         Errors,
         ValidationResponse,
         ServerValidationResponse
-    } from '../assets/js/types.ts';
+    } from '../assets/js/shared-types.ts';
 
-    import { validations, buildServerValidations } from '../assets/js/validations.ts';
+    import { validations, buildServerValidations } from '../assets/js/shared-validations.ts';
 
     type FormDetails = {
         name: string,
@@ -100,7 +100,7 @@
         methods: {
             async submitInquiry(attempts: number = 0): Promise<void> {
                 if (Object.keys(this.formMessages).length > 0) {
-                    this.formMessages = {};
+                    this.formMessages = {} as Errors;
                 }
 
                 if (this.isFormValid()) {

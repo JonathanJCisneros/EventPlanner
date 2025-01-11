@@ -7,6 +7,8 @@ import {
     type Router
 } from 'vue-router';
 
+import cookies from '../assets/js/cookies.ts';
+
 interface Meta {
     title: string,
     description: string,
@@ -200,15 +202,42 @@ const defaultMeta: Meta = {
 }
 
 router.beforeEach(async (to: RouteLocationNormalizedGeneric, from: RouteLocationNormalizedLoadedGeneric, next: NavigationGuardNext): Promise<void> => {
-    const loggedIn: boolean = localStorage.getItem('user_token') !== null;
+    if ((to.meta.hasOwnProperty('authorize') && to.meta.authorize) || (to.meta.hasOwnProperty('hideFromAuth') && to.meta.hideFromAuth)) {
+        let token: null | string = cookies.get('user_token');
 
-    if (to.meta.hasOwnProperty('authorize') && to.meta.authorize && !loggedIn) {
-        next('/user/login');
-        return;
-    }
-    else if (to.meta.hasOwnProperty('hideFromAuth') && to.meta.hideFromAuth && loggedIn) {
-        next('/user/account');
-    }
+        if (token) {
+            await fetch('https://localhost:7134/api/user/validatetoken', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(async (response: Response): Promise<boolean> => await response.json())
+                .then((data: boolean): void => {
+                    if (!data) {
+                        token = null;
+                    }
+                })
+                .catch((error: Error): void => {
+                    console.log(error);
+
+                    token = null;
+                });
+        }
+
+        if (to.meta.hasOwnProperty('authorize') && to.meta.authorize && !token) {
+            next('/user/login');
+
+            return;
+        }
+        else if (to.meta.hasOwnProperty('hideFromAuth') && to.meta.hideFromAuth && token) {
+            next('/user/account');
+
+            return;
+        }
+    }    
 
     let title: string = defaultMeta.title;
 

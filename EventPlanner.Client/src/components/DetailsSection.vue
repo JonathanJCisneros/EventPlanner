@@ -7,7 +7,10 @@
         <div class="image-container">
             <img :src="image.source" :alt="image.altText" />
         </div>
-        <div class="description" v-html="details"></div>
+        <div class="description">
+            <h3 v-if="subheading">{{ subheading }}</h3>
+            <p>{{ details }}</p>
+        </div>
     </section>
 </template>
 
@@ -38,6 +41,10 @@
             image: {
                 type: Object as PropType<ImageContent>,
                 required: true
+            },
+            subheading: {
+                type: String,
+                required: false
             },
             details: {
                 type: String,
@@ -93,7 +100,8 @@
         height: auto;
     }
 
-    .description {        
+    .description {
+        padding: 1rem;
         text-align: center;
     }
 </style>

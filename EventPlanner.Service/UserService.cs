@@ -107,7 +107,7 @@ namespace EventPlanner.Service
                 return response;
             } 
 
-            if (VerifyPassword(password, user.Password, Encoding.UTF8.GetBytes(user.Salt)))
+            if (!VerifyPassword(password, user.Password, Encoding.UTF8.GetBytes(user.Salt)))
             {
                 response.PasswordMatched = false;
                 response.Message = "We're sorry, we are unable to find an account matching this email and/or password.";
@@ -122,10 +122,28 @@ namespace EventPlanner.Service
                 }
 
                 _ = await _userRepository.Update(user);
+
+                return response;
             }
+            
+            if (user.PasswordAttempts > 0)
+            {
+                user.UpdatedDate = DateTime.UtcNow;
+                user.PasswordAttempts = 0;
+                user.IsAuthorized = true;
+
+                _ = await _userRepository.Update(user);
+            }
+
+            await _userRepository.Login(user.Id);
 
             return response;
         }
+
+        public async Task Logout(Guid id)
+        {
+            await _userRepository.Logout(id);
+        } 
 
         public async Task<bool> Create(User user)
         {

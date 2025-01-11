@@ -8,5 +8,7 @@ namespace EventPlanner.Service.Interfaces
         Task<bool> UserExists(string email);
 
         Task<AuthorizeResult> Authorize(string email, string password);
+
+        Task Logout(Guid id);
     }
 }

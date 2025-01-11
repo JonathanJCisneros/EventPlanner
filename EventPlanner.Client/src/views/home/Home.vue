@@ -16,9 +16,15 @@
                             source: './src/assets/img/no-photo.png',
                             altText: 'No Photo'
                         }"
-                        details="Row Layout"
+                        subheading="Row Layout"
+                        details="
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                            in culpa qui officia deserunt mollit anim id est laborum."
                         :colors="{
-                            font: 'black',
+                            font: 'white',
                             background: 'blue'
                         }" />
         <DetailsSection orientation="row-reverse"
@@ -26,7 +32,13 @@
                             source: './src/assets/img/no-photo.png',
                             altText: 'No Photo'
                         }"
-                        details="Reverse Row Layout"
+                        subheading="Row Reverse Layout"
+                        details="
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                            in culpa qui officia deserunt mollit anim id est laborum."
                         :colors="{
                             font: 'white',
                             background: 'green'
@@ -36,7 +48,13 @@
                             source: './src/assets/img/no-photo.png',
                             altText: 'No Photo'
                         }"
-                        details="Column Layout"
+                        subheading="Column Layout"
+                        details="
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                            in culpa qui officia deserunt mollit anim id est laborum."
                         :colors="{
                             font: 'white',
                             background: 'purple'
@@ -46,9 +64,15 @@
                             source: './src/assets/img/no-photo.png',
                             altText: 'No Photo'
                         }"
-                        details="Reverse Column Layout"
+                        subheading="Column Reverse Layout"
+                        details="
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+                            ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+                            in culpa qui officia deserunt mollit anim id est laborum."
                         :colors="{
-                            font: 'black',
+                            font: 'white',
                             background: 'red'
                         }" />
     </div>

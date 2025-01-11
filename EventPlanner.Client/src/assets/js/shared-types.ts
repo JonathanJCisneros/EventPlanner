@@ -5,7 +5,8 @@ export type FormResponse = {
 
 export type UserFormResponse = {
     success: boolean,
-    token?: null | string,
+    token: null | string,
+    expirationDays: null | number,
     message: string
 };
 

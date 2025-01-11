@@ -26,6 +26,7 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import { RouterLink } from 'vue-router';
+    import cookies from '../assets/js/cookies.ts';
 
     type Notification = {
         id: string,
@@ -56,6 +57,12 @@
         async created(): Promise<void> {
             await this.getNotifications();
         },
+        mounted(): void {
+            document.addEventListener('click', this.close);
+        },
+        beforeDestroy(): void {
+            document.removeEventListener('click', this.close);
+        },
         methods: {
             async getNotifications(attempts: number = 0): Promise<void> {
                 this.loading = true;
@@ -63,13 +70,17 @@
                 await fetch('https://localhost:7134/api/notification/getunread', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('user_token') as string}`,
+                        'Authorization': `Bearer ${cookies.get('user_token') as string}`,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     }
                 })
                     .then(async (response: Response): Promise<null | Notification[]> => {
                         if (!response.ok) {
+                            if (response.status === 401) {
+                                cookies.delete('user_token');
+                            }
+
                             return null;
                         }
 
@@ -97,6 +108,11 @@
                 if (attempts < 2) {
                     await this.getNotifications(attempts);
                 }  
+            },
+            close(event): void {
+                if (this.notificationsOpen && !event.target.closest('.notifications')) {
+                    this.notificationsOpen = false;
+                }
             },
             toggleNotifications(): void {
                 this.notificationsOpen = !this.notificationsOpen

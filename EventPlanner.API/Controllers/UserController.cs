@@ -3,6 +3,7 @@ using EventPlanner.API.Models.Forms.User;
 using EventPlanner.Core.Extension_Methods;
 using EventPlanner.Core.User;
 using EventPlanner.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -55,7 +56,7 @@ namespace EventPlanner.API.Controllers
                 issuer: _appSettings.Issuer,
                 audience: _appSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_appSettings.ExpirationTimeSpan),
+                expires: DateTime.UtcNow.AddDays(_appSettings.ExpirationDays),
                 signingCredentials: credentials
             );
 
@@ -65,6 +66,17 @@ namespace EventPlanner.API.Controllers
         #endregion Private Methods
 
         #region Public Methods/Actions
+
+        [HttpGet]
+        public bool ValidateToken()
+        {
+            if (User.Identity == null)
+            {
+                return false;
+            }
+
+            return User.Identity.IsAuthenticated;
+        }
 
         [HttpPost]
         public async Task<UserFormResponse> Login([FromBody] LoginModel model)
@@ -89,6 +101,7 @@ namespace EventPlanner.API.Controllers
             response.Success = true;
             response.Message = null;
             response.Token = GenerateToken(result);
+            response.ExpirationDays = _appSettings.ExpirationDays;
 
             return response;
         }
@@ -123,9 +136,19 @@ namespace EventPlanner.API.Controllers
                 AuthorizeResult result = new(user);
 
                 response.Token = GenerateToken(result);
+                response.ExpirationDays = _appSettings.ExpirationDays;
             }
 
             return response;
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task Logout()
+        {
+            Guid id = GetUserId();
+
+            await _userService.Logout(id);
         }
 
         #endregion Public Methods/Actions

@@ -10,7 +10,11 @@ namespace EventPlanner.Core.Event
 
         public required string Description { get; set; }
 
+        public string? Website { get; set; }
+
         public bool IsPublic { get; set; }
+
+        public bool IsDigital { get; set; }
 
         public int GuestMax { get; set; }
 
@@ -18,7 +22,7 @@ namespace EventPlanner.Core.Event
 
         public DateTime EndDate { get; set; }
 
-        public Guid AddressId { get; set; }
+        public Guid? AddressId { get; set; }
     }
 
     public enum EventType

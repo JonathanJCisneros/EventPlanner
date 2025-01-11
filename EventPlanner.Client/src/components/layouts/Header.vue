@@ -28,14 +28,21 @@
                     </ul>
                 </div>
                 <RouterLink to="/events">Upcoming Events</RouterLink>
-                <RouterLink to="/events/new" v-if="isLoggedIn">New Plan</RouterLink>
+                <RouterLink to="/events/new" v-if="isLoggedIn">New Event</RouterLink>
                 <RouterLink to="/contact">Contact Us</RouterLink>
             </div>
             <div>
                 <template v-if="isLoggedIn">
                     <Notifications />
                     <RouterLink to="/user/account">My Account</RouterLink>
-                    <a href="javascript:void(0)" v-on:click.prevent="logout">Logout</a>
+                    <a href="javascript:void(0)" v-on:click.prevent="logout">
+                        <template v-if="!loggingOut">
+                            Logout
+                        </template>
+                        <template v-else>
+                            <span class="loader"></span>
+                        </template>
+                    </a>
                 </template>
                 <RouterLink to="/user/login" v-else>Login</RouterLink>
             </div>
@@ -55,17 +62,20 @@
     import { defineComponent, defineAsyncComponent } from 'vue';
     import { RouterLink } from 'vue-router';
     import router from '../../routes/routes.ts';
+    import cookies from '../../assets/js/cookies.ts';
 
     interface Data {
         dropdownOpened: boolean,
-        menuOpened: boolean
+        menuOpened: boolean,
+        loggingOut: boolean
     }
 
     export default defineComponent({
         data(): Data {
             return {
                 dropdownOpened: false,
-                menuOpened: false
+                menuOpened: false,
+                loggingOut: false
             };
         },
         components: {
@@ -73,7 +83,7 @@
         },
         computed: {
             isLoggedIn: function (): boolean {
-                return localStorage.getItem('user_token') !== null;
+                return cookies.get('user_token') !== null;
             }
         },
         mounted(): void {
@@ -94,10 +104,31 @@
             toggleMenu(): void {
                 this.menuOpened = !this.menuOpened;
             },
-            logout(): void {
-                localStorage.removeItem('user_token');
+            async logout(): Promise<void> {
+                this.dropdownOpened = false;
+                this.loggingOut = true;
 
-                router.push('/user/login');
+                await fetch('https://localhost:7134/api/user/logout', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${cookies.get('user_token') as string}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(async (response: Response): Promise<boolean> => response.ok)
+                    .then(async (success: boolean): Promise<void> => {
+                        if (success) {
+                            cookies.delete('user_token');
+
+                            router.push('/user/login');                            
+                        }
+                    })
+                    .catch((error: Error): void => {
+                        console.log(error);
+                    });
+
+                this.loggingOut = false;
             }
         }
     });
@@ -113,6 +144,18 @@
         gap: 15px;
         position: relative;
     }
+
+    .loader {
+        height: 14px;
+        width: 14px;
+        border-width: 1.5px;
+    }
+
+        .loader::after {
+            height: 1.3rem;
+            width: 1.3rem;
+            border-width: 1.5px;
+        }
 
     .home {
         display: flex;

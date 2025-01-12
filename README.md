@@ -50,6 +50,7 @@
     </p>
   </dd></dl></dd></dl>
 </section>
+<hr />
 <section>
   <h3>EventPlanner.Repository</h3>
   <dl><dd><dl><dd>
@@ -65,6 +66,7 @@
     </p>
   </dd></dl></dd></dl>
 </section>
+<hr />
 <section>
   <h3>EventPlanner.Integration</h3>
   <dl><dd><dl><dd>
@@ -80,6 +82,7 @@
     </p>
   </dd></dl></dd></dl>
 </section>
+<hr />
 <section>
   <h3>EventPlanner.Core</h3>
   <dl><dd><dl><dd>
